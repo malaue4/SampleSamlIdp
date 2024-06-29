@@ -1,0 +1,35 @@
+<% content_for :title, "User sessions" %>
+
+<h1>User sessions</h1>
+<% columns = [:user_id, :created_at, :expires_at] %>
+<table id="user_sessions" class="table">
+  <thead>
+    <tr>
+      <th></th>
+      <% columns.each do |column| %>
+        <th><%= column %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <% @user_sessions.each do |user_session| %>
+    <tr>
+    <td>
+      <%= link_to "Show this user session", user_session %>
+    </td>
+    <% columns.each do |column| %>
+      <td><%= user_session[column] %></td>
+    <% end %>
+    </tr>
+  <% end %>
+  <tfoot>
+    <tr>
+    <td colspan="<%= columns.size + 1 %>">
+      <%= raw pagy_info(@pagy) %>
+    </td>
+    </tr>
+  </tfoot>
+</table>
+
+<%= raw pagy_bootstrap_nav(@pagy) %>
+
+<%= link_to "New user session", new_user_session_path %>

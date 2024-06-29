@@ -17,7 +17,22 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="d-grid min-vh-100 bg-body-secondary" style="grid-template-columns: 16rem 1fr">
+    <nav class="bg-body-tertiary border-end">
+      <ul class="nav nav-underline vstack px-3">
+        <li class="nav-item">
+          <%= link_to "Dashboard", :dashboard, class: { "nav-link" => true, "active" => current_page?(:dashboard) } %>
+        </li>
+        <li class="nav-item">
+          <%= link_to "Users", User, class: { "nav-link" => true, "active" => current_page?(User) } %>
+        </li>
+        <li class="nav-item">
+          <%= link_to "Sessions", UserSession, class: { "nav-link" => true, "active" => current_page?(UserSession) } %>
+        </li>
+      </ul>
+    </nav>
+    <main class="container bg-body-tertiary border-start border-end">
+      <%= yield %>
+    </main>
   </body>
 </html>

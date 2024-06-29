@@ -1,0 +1,7 @@
+<%# locals: (user_session:) -%>
+
+<%= bootstrap_form_with(model: user_session) do |form| %>
+  <%= form.alert_message t(".error", default: "Please fix the following errors:") %>
+  <%= form.number_field :user_id %>
+  <%= form.primary %>
+<% end %>

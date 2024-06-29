@@ -1,0 +1,40 @@
+<header class="border-bottom hstack mb-3">
+  <h1>Dashboard</h1>
+  <div class="ms-auto hstack gap-2">
+    <span class="btn-group">
+      <button type="button" class="btn btn-outline-secondary">Share</button>
+      <button type="button" class="btn btn-outline-secondary">Export</button>
+    </span>
+    <div class="dropdown">
+      <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-calendar"></i>
+        This week
+      </button>
+      <ul class="dropdown-menu">
+        <li><a href="#week" class="dropdown-item">Week</a></li>
+        <li><a href="#month" class="dropdown-item">Month</a></li>
+        <li><a href="#quarter" class="dropdown-item">Quarter</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+<div class="row row-cols-1 row-cols-md-2 g-4">
+  <div class="col">
+    <div class="card">
+      <div class="card-header">User sessions for the past week</div>
+      <div class="card-body">
+        <%= line_chart @user_sessions_chart_data %>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-header">User sessions by hour of the day</div>
+      <div class="card-body">
+        <%= column_chart @user_sessions_chart_data_time_of_day, xmax: 23 %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<pre><%= @user_sessions_chart_data.to_yaml %></pre>

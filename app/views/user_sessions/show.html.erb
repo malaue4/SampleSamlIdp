@@ -1,0 +1,8 @@
+<%= render @user_session %>
+
+<div>
+  <%= link_to "Edit this user session", edit_user_session_path(@user_session) %> |
+  <%= link_to "Back to user sessions", user_sessions_path %>
+
+  <%= button_to "Destroy this user session", @user_session, method: :delete %>
+</div>

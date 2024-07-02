@@ -14,4 +14,12 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  namespace :saml do
+    get "metadata" => "idp#show"
+    get "auth" => "idp#new"
+    post "auth" => "idp#create"
+    match "logout" => "idp#logout", via: [ :get, :post, :delete ]
+    get "attributes" => "idp#attributes"
+  end
 end

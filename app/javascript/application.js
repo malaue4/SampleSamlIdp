@@ -5,3 +5,5 @@ import "@popperjs/core"
 import * as bootstrap from "bootstrap"
 import "chartkick"
 import "Chart.bundle"
+
+Turbo.setFormMode("optin")

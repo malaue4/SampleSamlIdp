@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_06_28_193500) do
+ActiveRecord::Schema[7.2].define(version: 2024_07_01_202139) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "saml_metadata", force: :cascade do |t|
+    t.string "entity_id", null: false
+    t.json "config", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["entity_id"], name: "index_saml_metadata_on_entity_id", unique: true
+  end
 
   create_table "user_sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -24,12 +32,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_06_28_193500) do
 
   create_table "users", force: :cascade do |t|
     t.string "name_id", null: false
+    t.string "username", null: false
+    t.string "password_digest", null: false
     t.string "name"
     t.string "email"
     t.string "phone"
+    t.json "notes", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name_id"], name: "index_users_on_name_id", unique: true
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "user_sessions", "users", on_delete: :cascade

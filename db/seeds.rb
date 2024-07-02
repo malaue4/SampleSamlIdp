@@ -11,12 +11,21 @@
 generator = Rubystats::NormalDistribution.new(12, 3)
 
 User.delete_all
-100.times do
+30.times do
   user = User.create!(
     name_id: SecureRandom.uuid,
+    username: username = Faker::Internet.unique.user_name,
+    password: password = Faker::Internet.password,
     name: Faker::Internet.unique.user_name,
     email: Faker::Internet.unique.email,
     phone: Faker::PhoneNumber.unique.cell_phone,
+    notes: {
+      password: password,
+      job: Faker::Job.title,
+      company: Faker::Company.name,
+      address: Faker::Address.full_address,
+      country: Faker::Address.country,
+    }
   )
   30.times do
     created_at_date = Faker::Date.between(from: 1.month.ago, to: Date.today)

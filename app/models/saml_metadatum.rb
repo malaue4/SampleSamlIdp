@@ -1,0 +1,2 @@
+class SamlMetadatum < ApplicationRecord
+end

@@ -51,6 +51,11 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "better_errors", "~> 2.10"
+
+  gem "binding_of_caller", "~> 1.0"
+
 end
 
 group :development do

@@ -1,0 +1,18 @@
+<samlp:AttributeQuery xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                      ID="aaf23196-1773-2113-474a-fe114412ab72"
+                      Version="2.0"
+                      IssueInstant="2006-07-17T01:01:01Z"
+                      Destination="https://www.attributeauthority.com/SAML"
+>
+  <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://www.serviceprovider.com/SAML</saml:Issuer>
+  <saml:Subject xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+    <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient">
+      3f7b3dcf-1674-4ecd-92c8-1544f346baf8
+    </saml:NameID>
+  </saml:Subject>
+  <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+                  Name="email"
+                  NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+  >
+  </saml:Attribute>
+</samlp:AttributeQuery>

@@ -1,6 +1,17 @@
 <% content_for :title, "User sessions" %>
 
 <h1>User sessions</h1>
+<div class="p-4 border bg-body-secondary">
+  <%= bootstrap_form_for(@filter, url: user_sessions_path, method: :get, layout: :inline) do |f| %>
+    <%= f.text_field :name, floating: false %>
+    <%= f.text_field :email, floating: false %>
+    <%= f.text_field :phone, floating: false %>
+    <%= f.datetime_field :created_after, floating: false %>
+    <%= f.datetime_field :created_before, floating: false %>
+    <%= f.primary "Search" %>
+  <% end %>
+</div>
+
 <% columns = [:user_id, :created_at, :expires_at] %>
 <%= render "shared/paginated_table", records: @user_sessions, pagy: @pagy, columns: %>
 

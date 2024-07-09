@@ -1,35 +1,7 @@
 <%% content_for :title, "<%= human_name.pluralize %>" %>
 
 <h1><%= human_name.pluralize %></h1>
-<%% columns = <%= attributes.reject(&:password_digest?).map(&:path).inspect %> %>
-<table id="<%= plural_table_name %>" class="table">
-  <thead>
-    <tr>
-      <th></th>
-      <%% columns.each do |column| %>
-        <th><%%= column %></th>
-      <%% end %>
-    </tr>
-  </thead>
-  <%% @<%= plural_table_name %>.each do |<%= singular_table_name %>| %>
-    <tr>
-    <td>
-      <%%= link_to "Show this <%= human_name.downcase %>", <%= model_resource_name(singular_table_name) %> %>
-    </td>
-    <%% columns.each do |column| %>
-      <td><%%= <%= singular_table_name %>[column] %></td>
-    <%% end %>
-    </tr>
-  <%% end %>
-  <tfoot>
-    <tr>
-    <td colspan="<%%= columns.size + 1 %>">
-      <%%= pagy_info(@pagy) %>
-    </td>
-    </tr>
-  </tfoot>
-</table>
-
-<%%= pagy_bootstrap_nav(@pagy) %>
+<%% columns = <%= attributes.reject(&:password_digest?).map(&:name).inspect %> %>
+<%%= render "shared/paginated_table", records: @<%= plural_table_name %>, pagy: @pagy, columns: %>
 
 <%%= link_to "New <%= human_name.downcase %>", <%= new_helper(type: :path) %> %>

@@ -8,8 +8,12 @@ class User < ApplicationRecord
 
   has_secure_password
 
+  before_create do
+    self.notes ||= { password: }
+  end
+
   def persistent
-    id
+    name_id
   end
 
   def active?

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 SamlIdp.configure do |config|
-  base = "http://idp.localhost:3000"
+  base = "http://sampleidp.localhost:5001"
 
   config.x509_certificate = <<CERT
 -----BEGIN CERTIFICATE-----

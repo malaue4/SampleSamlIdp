@@ -22,4 +22,6 @@ Rails.application.routes.draw do
     match "logout" => "idp#logout", via: [ :get, :post, :delete ]
     get "attributes" => "idp#attributes"
   end
+
+  root to: redirect("/dashboard")
 end

@@ -8,7 +8,6 @@ module Saml
 
     before_action :validate_saml_request, only: [ :new, :create, :logout ]
 
-
     def new
     end
 
@@ -17,12 +16,13 @@ module Saml
     end
 
     def create
-      unless user_params[:email].blank? && user_params[:password].blank?
-        person = idp_authenticate(user_params[:email], user_params[:password])
+      unless user_params[:username].blank? && user_params[:password].blank?
+        person = idp_authenticate(user_params[:username], user_params[:password])
         if person.nil?
-          @saml_idp_fail_msg = "Incorrect email or password."
+          @saml_idp_fail_msg = "Incorrect username or password."
         else
-          person.user_sessions.create!
+          user_session = person.user_sessions.create!
+          session[:session_id] = user_session.id
           @saml_response = idp_make_saml_response(person)
           render template: "saml/idp/saml_post", layout: false
           return
@@ -40,16 +40,17 @@ module Saml
     def attributes
       @saml_request = decode_request params[:SAMLRequest]
       @saml_request.valid?
+      # TODO: Implement AttributeAuthorityService
     end
 
     def idp_logout
-      user = User.find_by_email(saml_request.name_id)
+      user = User.find_by(name_id: saml_request.name_id)
       user.logout
     end
     private :idp_logout
 
-    def idp_authenticate(email, password)
-      user = User.find_by_email(email)
+    def idp_authenticate(username, password)
+      user = User.find_by(username: username)
       user && user.authenticate(password) ? user : nil
     end
     protected :idp_authenticate
@@ -67,7 +68,15 @@ module Saml
     private
 
       def user_params
-        params.fetch(:user, {}).permit(:email, :password)
+        params.fetch(:user, {}).permit(:username, :password)
+      end
+
+      def user_session
+        @user_session ||= UserSession.find_by(id: session[:session_id])
+      end
+
+      def current_user
+        @current_user ||= user_session&.user
       end
   end
 end

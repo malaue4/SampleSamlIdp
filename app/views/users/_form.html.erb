@@ -1,10 +1,18 @@
+<%# locals: (user:) -%>
+
 <%= bootstrap_form_with(model: user) do |form| %>
   <%= form.alert_message t(".error", default: "Please fix the following errors:") %>
 
   <%= form.text_field :nameid, floating: true %>
   <%= form.text_field :name, floating: true %>
+  <%= form.text_field :username, floating: true %>
   <%= form.email_field :email, floating: true %>
   <%= form.telephone_field :phone, floating: true %>
 
+  <%= form.password_field :password, floating: true, autocomplete: "new-password" %>
+  <%= form.password_field :password_confirmation, floating: true, autocomplete: "new-password" %>
+  <% if user.persisted? %>
+    <%= form.password_field :password_challenge, floating: true, autocomplete: "current-password" %>
+  <% end %>
   <%= form.primary %>
 <% end %>

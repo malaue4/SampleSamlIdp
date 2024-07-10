@@ -78,3 +78,5 @@ gem "faker", "~> 3.4"
 gem "rubystats", "~> 0.4.1"
 
 gem "saml_idp", "~> 0.16.0"
+
+gem "rouge", "~> 4.3"

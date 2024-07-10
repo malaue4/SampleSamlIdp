@@ -1,0 +1,8 @@
+<%= render @saml_metadatum %>
+
+<div>
+  <%= link_to "Edit this saml metadatum", edit_saml_metadatum_path(@saml_metadatum) %> |
+  <%= link_to "Back to saml metadata", saml_metadata_path %>
+
+  <%= button_to "Destroy this saml metadatum", @saml_metadatum, method: :delete %>
+</div>

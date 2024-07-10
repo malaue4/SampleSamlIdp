@@ -1,0 +1,33 @@
+<div id="<%= dom_id saml_metadatum %>">
+  <p>
+    <strong>Entity:</strong>
+    <%= saml_metadatum.entity_id %>
+  </p>
+
+  <p>
+    <strong>Metadata url:</strong>
+    <%= saml_metadatum.metadata_url %>
+  </p>
+
+  <p>
+    <strong>Fingerprint:</strong>
+    <%= saml_metadatum.fingerprint %>
+  </p>
+
+  <p>
+    <strong>Validates Metadata Signature:</strong>
+    <%= saml_metadatum.validates_signature %>
+  </p>
+
+  <div>
+    <strong>Metadata:</strong>
+    <%
+      source = saml_metadatum.config["raw"]
+      formatter = Rouge::Formatters::HTMLLinewise.new Rouge::Formatters::HTML.new
+      lexer = Rouge::Lexers::XML.new
+    %>
+    <pre class="highlight"><%= raw formatter.format(lexer.lex(source)) %></pre>
+    <style><%= Rouge::Themes::Pastie.render %></style>
+  </div>
+
+</div>

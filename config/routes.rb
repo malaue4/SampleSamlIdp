@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :saml_metadata
   resource :dashboard, only: :show
   resources :user_sessions
   resources :users

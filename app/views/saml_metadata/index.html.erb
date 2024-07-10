@@ -1,0 +1,7 @@
+<% content_for :title, "Saml metadata" %>
+
+<h1>Saml metadata</h1>
+<% columns = ["entity_id", "metadata_url", "fingerprint"] %>
+<%= render "shared/paginated_table", records: @saml_metadata, pagy: @pagy, columns: %>
+
+<%= link_to "New saml metadatum", new_saml_metadatum_path %>

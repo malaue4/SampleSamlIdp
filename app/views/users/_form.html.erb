@@ -3,7 +3,7 @@
 <%= bootstrap_form_with(model: user) do |form| %>
   <%= form.alert_message t(".error", default: "Please fix the following errors:") %>
 
-  <%= form.text_field :nameid, floating: true %>
+  <%= form.text_field :name_id, floating: true %>
   <%= form.text_field :name, floating: true %>
   <%= form.text_field :username, floating: true %>
   <%= form.email_field :email, floating: true %>

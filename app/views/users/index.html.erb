@@ -2,7 +2,7 @@
 
 <h1>Users</h1>
 
-<%= render "shared/paginated_table", records: @users, pagy: @pagy, columns: %i[id nameid name email phone created_at updated_at] %>
+<%= render "shared/paginated_table", records: @users, pagy: @pagy, columns: %i[id name_id name email phone created_at updated_at] %>
 
 <div id="users">
   <% @users.each do |user| %>

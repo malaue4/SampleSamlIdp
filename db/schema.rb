@@ -16,7 +16,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_07_01_202139) do
 
   create_table "saml_metadata", force: :cascade do |t|
     t.string "entity_id", null: false
+    t.string "metadata_url", null: false
+    t.string "fingerprint"
+    t.text "certificate"
     t.json "config", null: false
+    t.boolean "validates_signature", default: true, null: false
+    t.string "assertion_consumer_service_url"
+    t.string "single_logout_service_url"
+    t.text "response_hosts", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["entity_id"], name: "index_saml_metadata_on_entity_id", unique: true

@@ -1,32 +1,50 @@
 <%# locals: (records:, pagy:, columns: nil) -%>
 <% columns ||= records %>
 <% record_model ||= records.model %>
-<table id="<%= record_model.model_name.route_key %>" class="table">
-  <thead>
-  <tr>
-    <th></th>
-    <% columns.each do |column| %>
-      <th><%= record_model.human_attribute_name column %></th>
+<div class="p-0">
+  <table id="<%= record_model.model_name.route_key %>" class="table table-borderless table-striped m-0">
+    <thead class="sticky-top">
+    <% if @filter %>
+      <tr>
+        <th colspan="<%= columns.size + 1 %>">
+          <%= @filter.attributes %>
+          <%= bootstrap_form_for(@filter, url: "", method: :get, layout: :inline) do |f| %>
+            <% @filter.fields.each do |name, options| %>
+              <% options => type:, **field_options %>
+              <%= f.public_send type, name, **field_options %>
+            <% end %>
+            <button type="reset" class="btn btn-danger"><i class="bi-x-lg"></i></button>
+            <%= f.primary "Search" %>
+          <% end %>
+        </th>
+      </tr>
     <% end %>
-  </tr>
-  </thead>
-  <% records.each do |record| %>
     <tr>
-      <td>
-        <%= link_to "Show this", record %>
-      </td>
+      <th></th>
       <% columns.each do |column| %>
-        <td><%= record[column] %></td>
+        <th><%= record_model.human_attribute_name column %></th>
       <% end %>
     </tr>
-  <% end %>
-  <tfoot>
-  <tr>
-    <td colspan="<%= columns.size + 1 %>">
-      <%= raw pagy_info(pagy) %>
-    </td>
-  </tr>
-  </tfoot>
-</table>
-
-<%= raw pagy_bootstrap_nav(pagy) %>
+    </thead>
+    <% records.each do |record| %>
+      <tr>
+        <td>
+          <%= link_to "Show this", record %>
+        </td>
+        <% columns.each do |column| %>
+          <td><%= record[column] %></td>
+        <% end %>
+      </tr>
+    <% end %>
+    <tfoot class="sticky-bottom text-center">
+    <tr>
+      <td colspan="<%= columns.size + 1 %>">
+        <%= raw pagy_info(pagy) %>
+      </td>
+    </tr>
+    </tfoot>
+  </table>
+</div>
+<% content_for :footer do %>
+    <%= raw pagy_bootstrap_nav(pagy, classes: "pagination m-0") %>
+<% end %>

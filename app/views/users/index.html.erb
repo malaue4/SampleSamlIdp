@@ -1,16 +1,8 @@
 <% content_for :title, "Users" %>
 
-<h1>Users</h1>
+<% content_for :header do %>
+  <h1>Users</h1>
+  <%= link_to "New user", new_user_path %>
+<% end %>
 
 <%= render "shared/paginated_table", records: @users, pagy: @pagy, columns: %i[id name_id name email phone created_at updated_at] %>
-
-<div id="users">
-  <% @users.each do |user| %>
-    <%= render user %>
-    <p>
-      <%= link_to "Show this user", user %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to "New user", new_user_path %>

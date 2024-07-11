@@ -1,33 +1,35 @@
-<header class="border-bottom hstack mb-3">
-  <h1>Dashboard</h1>
-  <div class="ms-auto hstack gap-2">
-    <span class="btn-group">
-      <button type="button" class="btn btn-outline-secondary">Share</button>
-      <button type="button" class="btn btn-outline-secondary">Export</button>
-    </span>
-    <div class="dropdown">
-      <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-calendar"></i>
-        <% case params[:period]&.to_unsafe_h %>
-        <% in week: _ %>
-          This week
-        <% in month: _ %>
-          This month
-        <% in quarter: _ %>
-          This quarter
-        <% else %>
-          This week
-        <% end %>
-      </button>
-      <ul class="dropdown-menu">
-        <% today = Date.current %>
-        <li><%= link_to("This week", { period: { year: today.year, week: today.cweek } }, class: "dropdown-item") %></li>
-        <li><%= link_to("This month", { period: { year: today.year, month: today.month } }, class: "dropdown-item") %></li>
-        <li><%= link_to("This quarter", { period: { year: today.year, quarter: today.quarter } }, class: "dropdown-item") %></li>
-      </ul>
+<% content_for :header do %>
+  <div class="hstack">
+    <h1>Dashboard</h1>
+    <div class="ms-auto hstack gap-2">
+      <span class="btn-group">
+        <button type="button" class="btn btn-outline-secondary">Share</button>
+        <button type="button" class="btn btn-outline-secondary">Export</button>
+      </span>
+      <div class="dropdown">
+        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-calendar"></i>
+          <% case params[:period]&.to_unsafe_h %>
+          <% in week: _ %>
+            This week
+          <% in month: _ %>
+            This month
+          <% in quarter: _ %>
+            This quarter
+          <% else %>
+            This week
+          <% end %>
+        </button>
+        <ul class="dropdown-menu">
+          <% today = Date.current %>
+          <li><%= link_to("This week", { period: { year: today.year, week: today.cweek } }, class: "dropdown-item") %></li>
+          <li><%= link_to("This month", { period: { year: today.year, month: today.month } }, class: "dropdown-item") %></li>
+          <li><%= link_to("This quarter", { period: { year: today.year, quarter: today.quarter } }, class: "dropdown-item") %></li>
+        </ul>
+      </div>
     </div>
   </div>
-</header>
+<% end %>
 <div class="row row-cols-1 row-cols-md-2 g-4">
   <div class="col">
     <div class="card">

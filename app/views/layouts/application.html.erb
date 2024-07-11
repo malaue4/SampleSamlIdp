@@ -17,7 +17,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="d-grid min-vh-100 bg-body-secondary" style="grid-template-columns: 16rem 1fr">
+  <body class="d-grid vh-100 bg-body-secondary" style="grid-template-columns: 16rem 1fr; grid-template-rows: 100%">
     <nav class="bg-body-tertiary border-end">
       <ul class="nav nav-underline vstack px-3">
         <li class="nav-item">
@@ -34,8 +34,16 @@
         </li>
       </ul>
     </nav>
-    <main class="container bg-body-tertiary border-start border-end">
-      <%= yield %>
+    <main class="container-md container-fluid bg-body border-start border-end d-grid" style="grid-template-rows: auto 1fr auto;">
+      <header class="row border-bottom bg-body-tertiary p-3">
+        <%= content_for :header %>
+      </header>
+      <div class="row overflow-y-auto">
+        <%= yield %>
+      </div>
+      <footer class="row border-top bg-body-tertiary p-3 <%= "d-none" unless content_for? :footer %>">
+        <%= content_for :footer %>
+      </footer>
     </main>
   </body>
 </html>

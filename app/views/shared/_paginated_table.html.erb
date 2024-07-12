@@ -7,20 +7,19 @@
     <% if @filter %>
       <tr>
         <th colspan="<%= columns.size + 1 %>">
-          <%= @filter.attributes %>
           <%= bootstrap_form_for(@filter, url: "", method: :get, layout: :inline) do |f| %>
             <% @filter.fields.each do |name, options| %>
               <% options => type:, **field_options %>
-              <%= f.public_send type, name, **field_options %>
+              <%= f.public_send type, name, **field_options.reverse_merge(floating: true) %>
             <% end %>
             <button type="reset" class="btn btn-danger"><i class="bi-x-lg"></i></button>
-            <%= f.primary "Search" %>
+            <%= f.primary { tag.i(nil, class: "bi bi-search") } %>
           <% end %>
         </th>
       </tr>
     <% end %>
     <tr>
-      <th></th>
+      <th>ID</th>
       <% columns.each do |column| %>
         <th><%= record_model.human_attribute_name column %></th>
       <% end %>
@@ -29,7 +28,7 @@
     <% records.each do |record| %>
       <tr>
         <td>
-          <%= link_to "Show this", record %>
+          <%= link_to tag.i(record.id, class: "bi bi-search"), record %>
         </td>
         <% columns.each do |column| %>
           <td><%= record[column] %></td>

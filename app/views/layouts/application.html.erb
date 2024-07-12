@@ -20,18 +20,16 @@
   <body class="d-grid vh-100 bg-body-secondary" style="grid-template-columns: 16rem 1fr; grid-template-rows: 100%">
     <nav class="bg-body-tertiary border-end">
       <ul class="nav nav-underline vstack px-3">
-        <li class="nav-item">
-          <%= link_to "Dashboard", :dashboard, class: { "nav-link" => true, "active" => current_page?(:dashboard) } %>
-        </li>
-        <li class="nav-item">
-          <%= link_to "Users", User, class: { "nav-link" => true, "active" => current_page?(User) } %>
-        </li>
-        <li class="nav-item">
-          <%= link_to "Sessions", UserSession, class: { "nav-link" => true, "active" => current_page?(UserSession) } %>
-        </li>
-        <li class="nav-item">
-          <%= link_to "Service Providers", SamlMetadatum, class: { "nav-link" => true, "active" => current_page?(SamlMetadatum) } %>
-        </li>
+        <% [:dashboard, User, UserSession, SamlMetadatum].each do |link| %>
+          <li class="nav-item">
+            <%= link_to link_label(link),
+              link,
+              class: {
+                "nav-link" => true,
+                "active" => request.fullpath.starts_with?(url_for(link))
+              } %>
+          </li>
+        <% end %>
       </ul>
     </nav>
     <main class="container-md container-fluid bg-body border-start border-end d-grid" style="grid-template-rows: auto 1fr auto;">

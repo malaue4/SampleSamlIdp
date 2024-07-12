@@ -11,7 +11,7 @@ class SamlMetadatum < ApplicationRecord
     def refresh_metadata
       metadata = SamlIdp::IncomingMetadata.new Net::HTTP.get(URI.parse(metadata_url))
 
-      self.validates_signature = metadata.document.signed?
+      self.validates_signature = validates_signature? && metadata.document.signed?
 
       if validates_signature?
         cert = OpenSSL::X509::Certificate.new Base64.decode64 metadata.signing_certificate

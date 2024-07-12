@@ -1,11 +1,12 @@
 <%# locals: (saml_metadatum:) -%>
 
 <%= bootstrap_form_with(model: saml_metadatum) do |form| %>
-  <% form.alert_message t(".error", default: "Please fix the following errors:") %>
+  <%= form.alert_message t(".error", default: "Please fix the following errors:") %>
 
-    <%= form.text_field :entity_id, label: "Entity ID" %>
-    <%= form.url_field :metadata_url %>
-    <%= form.text_field :fingerprint %>
+  <%= form.text_field :entity_id, label: "Entity ID" %>
+  <%= form.url_field :metadata_url %>
+  <%= form.text_field :fingerprint %>
+  <%= form.check_box :validates_signature %>
 
-    <%= form.primary %>
+  <%= form.primary %>
 <% end %>

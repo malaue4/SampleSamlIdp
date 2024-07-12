@@ -19,14 +19,14 @@
     <%= saml_metadatum.validates_signature %>
   </p>
 
-  <div>
-    <strong>Metadata:</strong>
+  <div class="card">
+    <strong class="card-header">Metadata:</strong>
     <%
-      source = saml_metadatum.config["raw"]
-      formatter = Rouge::Formatters::HTMLLinewise.new Rouge::Formatters::HTML.new
+      source = Nokogiri::XML(saml_metadatum.config["raw"]).to_xml
+      formatter = Rouge::Formatters::HTMLLineTable.new Rouge::Formatters::HTML.new
       lexer = Rouge::Lexers::XML.new
     %>
-    <pre class="highlight"><%= raw formatter.format(lexer.lex(source)) %></pre>
+    <pre class="card-body m-0 highlight"><%= raw formatter.format(lexer.lex(source)) %></pre>
     <style><%= Rouge::Themes::Pastie.render %></style>
   </div>
 

@@ -48,6 +48,6 @@ class SamlMetadataController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def saml_metadatum_params
-      params.require(:saml_metadatum).permit(:entity_id, :metadata_url, :fingerprint)
+      params.require(:saml_metadatum).permit(:entity_id, :metadata_url, :fingerprint, :validates_signature)
     end
 end

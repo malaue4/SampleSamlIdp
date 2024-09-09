@@ -169,7 +169,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.6-x86_64-linux)
       racc (~> 1.4)
-    pagy (8.6.1)
+    pagy (9.0.9)
     parallel (1.25.1)
     parser (3.3.3.0)
       ast (~> 2.4.1)
@@ -339,7 +339,7 @@ DEPENDENCIES
   groupdate (~> 6.4)
   importmap-rails
   jbuilder
-  pagy (~> 8.6)
+  pagy (~> 9.0)
   pg (~> 1.1)
   puma (>= 5.0)
   rails (~> 7.2.0.beta2)

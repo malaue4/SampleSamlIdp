@@ -4,11 +4,11 @@ module ApplicationHelper
   def link_label(link)
     case link
     in Class if link < ApplicationRecord
-      link.model_name.human(count: 2)
+      "Case 1 - " + link.model_name.human(count: 2)
     in ApplicationRecord
-      link.model_name.human(count: 2)
+      "Case 2 - " + link.model_name.human(count: 2)
     else
-      link.to_s.humanize
+      "Case 3 - " + link.to_s.humanize
     end
   end
 end

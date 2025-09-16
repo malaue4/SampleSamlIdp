@@ -31,3 +31,14 @@ en:
   attributes:
     name_id: Name ID
     entity_id: Entity ID
+  activerecord:
+    models:
+      saml_metadatum:
+        one: SAML Metadatum
+        other: SAML Metadata
+      user_session:
+        one: User session
+        other: User sessions
+      user:
+        one: User
+        other: Users

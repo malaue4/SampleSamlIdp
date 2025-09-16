@@ -1,11 +1,14 @@
 <% content_for :title, "New user" %>
-
-<h1>New user</h1>
-
-<%= render "form", user: @user %>
+<% content_for :header do %>
+  <h1>New user</h1>
+<% end %>
 
 <br>
 
-<div>
-  <%= link_to "Back to users", users_path %>
-</div>
+<%= render "form", user: @user %>
+
+<% content_for :footer do %>
+  <div>
+    <%= link_to "Back to users", users_path %>
+  </div>
+<% end %>

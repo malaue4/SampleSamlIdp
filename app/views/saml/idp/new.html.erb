@@ -9,4 +9,5 @@
   <%= f.text_field :password, floating: true, value: user.notes["password"] %>
 
   <%= f.primary "Sign in" %>
+  <%= submit_tag("Cancel", class: "btn btn-danger") %>
 <% end %>

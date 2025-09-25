@@ -224,8 +224,10 @@ module Saml
         return if requested_authn_context_element.nil?
 
         @requested_authn_context ||= {
-          class_refs: requested_authn_context_element.xpath("AuthnContextClassRef").map(&:text).presence,
-          decl_refs: requested_authn_context_element.xpath("AuthnContextDeclRef").map(&:text).presence,
+          class_refs: requested_authn_context_element
+            .xpath("saml:AuthnContextClassRef", "saml" => Namespaces::SAML).map(&:text).presence,
+          decl_refs: requested_authn_context_element
+            .xpath("saml:AuthnContextDeclRef", "saml" => Namespaces::SAML).map(&:text).presence,
           comparison: requested_authn_context_element.attribute("Comparison")&.value
         }.compact
       end

@@ -5,6 +5,8 @@ class User < ApplicationRecord
     where(id: user.user_sessions.maximum(:id), expires_at: Time.current..)
   }, class_name: "UserSession"
 
+  validates :name_id, presence: true
+
   has_secure_password
 
   before_create do

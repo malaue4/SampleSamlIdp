@@ -79,7 +79,7 @@ module Saml
     #
     # @return [String, nil]
     def issuer_entity_id
-      @issuer_entity_id ||= request_element.at_xpath('/saml:Issuer')&.text
+      @issuer_entity_id ||= request_element.at_xpath('saml:Issuer')&.text
     end
 
     # The Signature element of the request. This element contains the XML Signature
@@ -87,9 +87,9 @@ module Saml
     #
     # If the signature element is not present in the request, this will return `nil`.
     #
-    # @return [Nokogiri::XML::Element, nil]
+    # @return [Nokogiri::XML::Node, nil]
     def signature_element
-      @signature_element ||= request_element.at_xpath("/ds:Signature", "ds" => Namespaces::DS)
+      @signature_element ||= request_element.at_xpath("ds:Signature", "ds" => Namespaces::DS)
     end
 
     # The Extensions element of the request. This element contains optional metadata or additional elements
@@ -97,9 +97,9 @@ module Saml
     #
     # If the Extensions element is not present in the request, this will return `nil`.
     #
-    # @return [Nokogiri::XML::Element, nil]
-    def extentions_element
-      @extentions_element ||= request_element.at_xpath("/samlp:Extensions", "samlp" => Namespaces::SAMLP)
+    # @return [Nokogiri::XML::Node, nil]
+    def extensions_element
+      @extensions_element ||= request_element.at_xpath("samlp:Extensions", "samlp" => Namespaces::SAMLP)
     end
 
     concerning :AuthnRequest do
@@ -149,7 +149,7 @@ module Saml
       def subject_element
         return unless request_element.name == "AuthnRequest"
 
-        @subject_element ||= request_element.at_xpath("/saml:Subject", "saml" => Namespaces::SAML)
+        @subject_element ||= request_element.at_xpath("saml:Subject", "saml" => Namespaces::SAML)
       end
 
       def subject
@@ -158,15 +158,15 @@ module Saml
         # TODO: Implement SubjectConfirmation and SubjectConfirmationData
 
         @subject ||= {
-          name_id: subject_element.at_xpath("/saml:NameID", "saml" => Namespaces::SAML)&.text,
-          name_id_format: subject_element.at_xpath("/saml:NameID", "saml" => Namespaces::SAML)&.attribute("Format")&.value,
+          name_id: subject_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)&.text,
+          name_id_format: subject_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)&.attribute("Format")&.value,
         }
       end
 
       def name_id_policy_element
         return unless request_element.name == "AuthnRequest"
 
-        @name_id_policy_element ||= request_element.at_xpath("/samlp:NameIDPolicy", "samlp" => Namespaces::SAMLP)
+        @name_id_policy_element ||= request_element.at_xpath("samlp:NameIDPolicy", "samlp" => Namespaces::SAMLP)
       end
 
       def name_id_policy
@@ -182,7 +182,7 @@ module Saml
       def conditions_element
         return unless request_element.name == "AuthnRequest"
 
-        @conditions_element ||= request_element.at_xpath("/saml:Conditions", "saml" => Namespaces::SAML)
+        @conditions_element ||= request_element.at_xpath("saml:Conditions", "saml" => Namespaces::SAML)
       end
 
       # Returns conditions extracted from the SAML request, including audience restrictions,
@@ -205,9 +205,9 @@ module Saml
 
         @conditions ||= {
           audience_restrictions: conditions_element
-            .xpath("/saml:AudienceRestriction/saml:Audience", "saml" => Namespaces::SAML)
+            .xpath("saml:AudienceRestriction/saml:Audience", "saml" => Namespaces::SAML)
             .map(&:text),
-          one_time_use: conditions_element.at_xpath("/saml:OneTimeUse", "saml" => Namespaces::SAML).present?,
+          one_time_use: conditions_element.at_xpath("saml:OneTimeUse", "saml" => Namespaces::SAML).present?,
           proxy_restriction: [], # TODO: It looks like this: `<ProxyRestriction Count="2"><Audience>https://www.example.com/sp</Audience></ProxyRestriction>`
           not_before: conditions_element&.attribute("NotBefore")&.value,
           not_on_or_after: conditions_element&.attribute("NotOnOrAfter")&.value,
@@ -217,13 +217,23 @@ module Saml
       def requested_authn_context_element
         return unless request_element.name == "AuthnRequest"
 
-        @requested_authn_context_element ||= request_element.at_xpath("/samlp:RequestedAuthnContext", "samlp" => Namespaces::SAMLP)
+        @requested_authn_context_element ||= request_element.at_xpath("samlp:RequestedAuthnContext", "samlp" => Namespaces::SAMLP)
+      end
+
+      def requested_authn_context
+        return if requested_authn_context_element.nil?
+
+        @requested_authn_context ||= {
+          class_refs: requested_authn_context_element.xpath("AuthnContextClassRef").map(&:text).presence,
+          decl_refs: requested_authn_context_element.xpath("AuthnContextDeclRef").map(&:text).presence,
+          comparison: requested_authn_context_element.attribute("Comparison")&.value
+        }.compact
       end
 
       def scoping_element
         return unless request_element.name == "AuthnRequest"
 
-        @scoping_element ||= request_element.at_xpath("/samlp:Scoping", "samlp" => Namespaces::SAMLP)
+        @scoping_element ||= request_element.at_xpath("samlp:Scoping", "samlp" => Namespaces::SAMLP)
       end
 
       def scoping
@@ -232,14 +242,14 @@ module Saml
         @scoping ||= {
           proxy_count: scoping_element.attribute("ProxyCount")&.value&.to_i,
           idp_list: {
-            entries: scoping_element.xpath("/samlp:IDPList/samlp:IDPEntry", "samlp" => Namespaces::SAMLP).map do |entry|
+            entries: scoping_element.xpath("samlp:IDPList/samlp:IDPEntry", "samlp" => Namespaces::SAMLP).map do |entry|
               {
                 provider_id: entry.attribute("ProviderID")&.value,
                 name: entry.attribute("Name")&.value,
                 location: entry.attribute("Loc")&.value,
               }
             end,
-            get_complete: scoping_element.at_xpath("/samlp:IDPList/samlp:GetComplete", "samlp" => Namespaces::SAMLP)&.value
+            get_complete: scoping_element.at_xpath("samlp:IDPList/samlp:GetComplete", "samlp" => Namespaces::SAMLP)&.value
           }
         }
       end

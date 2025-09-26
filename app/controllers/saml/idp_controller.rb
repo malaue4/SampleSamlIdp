@@ -6,10 +6,17 @@ module Saml
 
     protect_from_forgery
 
-    before_action :validate_saml_request, only: [ :new, :create, :logout ]
+    attr_reader :saml_request
+
+    before_action :require_saml_request, only: [ :new, :create, :logout ]
     skip_before_action :authenticate_user!
 
     def new
+      metadata = SamlMetadatum.find_by! entity_id: saml_request.issuer_entity_id
+
+      if !saml_request.verify_signature(metadata.parsed_metadata.fetch(:signing_certificate))
+        raise "The signature is invalid!"
+      end
     end
 
     def show
@@ -169,5 +176,9 @@ module Saml
         sig.dsig :SignatureValue
       end
     end
+
+      def require_saml_request
+        @saml_request = Request.parse(params.require(:SAMLRequest))
+      end
   end
 end

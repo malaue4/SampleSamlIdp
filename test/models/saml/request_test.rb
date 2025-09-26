@@ -76,12 +76,12 @@ CERTIFICATE
     def test_needs_inflation
       strings_that_arent_deflated = %w[test these strings boi before i fall_apart slowlygentlythisishowalifeistaken]
       strings_that_arent_deflated.each do |word|
-        assert !Request.needs_inflation?(word)
+        assert !Request::Compression.needs_inflation?(word)
       end
 
-      strings_that_are_deflated = strings_that_arent_deflated.map { |word| Request.deflate(word) }
+      strings_that_are_deflated = strings_that_arent_deflated.map { |word| Request::Compression.deflate(word) }
       strings_that_are_deflated.each do |word|
-        assert Request.needs_inflation?(word)
+        assert Request::Compression.needs_inflation?(word)
       end
     end
 
@@ -89,13 +89,13 @@ CERTIFICATE
       Faker::HTML.random
       strings_that_arent_encoded = 10.times.map { Faker::HTML.random }
       strings_that_arent_encoded.each do |word|
-        pp Request.decode(word)
-        assert !Request.needs_decoding?(word), "Expected #{word} to not need decoding"
+        pp Request::Encoding.decode(word)
+        assert !Request::Encoding.needs_decoding?(word), "Expected #{word} to not need decoding"
       end
 
       strings_that_are_encoded = strings_that_arent_encoded.map { |word| Base64.encode64(word) }
       strings_that_are_encoded.each do |word|
-        assert Request.needs_decoding?(word), "Expected #{word} to need decoding"
+        assert Request::Encoding.needs_decoding?(word), "Expected #{word} to need decoding"
       end
     end
 
@@ -105,7 +105,7 @@ CERTIFICATE
         "these" => "x\xDA+\xC9H-N\x05\x00\x06c\x02\x1A".dup.force_encoding("ASCII-8BIT"),
         "strings" => "x\xDA+.)\xCA\xCCK/\x06\x00\fM\x03\v".dup.force_encoding("ASCII-8BIT"),
       }.each do |inflated_word, deflated_word|
-        assert_equal deflated_word, Request.deflate(inflated_word)
+        assert_equal deflated_word, Request::Compression.deflate(inflated_word)
       end
     end
 
@@ -115,14 +115,14 @@ CERTIFICATE
         "these" => "x\xDA+\xC9H-N\x05\x00\x06c\x02\x1A".dup.force_encoding("ASCII-8BIT"),
         "strings" => "x\xDA+.)\xCA\xCCK/\x06\x00\fM\x03\v".dup.force_encoding("ASCII-8BIT"),
       }.each do |inflated_word, deflated_word|
-        assert_equal inflated_word, Request.inflate(deflated_word)
+        assert_equal inflated_word, Request::Compression.inflate(deflated_word)
       end
     end
 
     def test_decode
       %w[test these strings boi before i fall_apart slowlygentlythisishowalifeistaken].each do |word|
         encoded = Base64.encode64(word)
-        decoded = Request.decode(encoded)
+        decoded = Request::Encoding.decode(encoded)
         assert_equal word, decoded
       end
     end

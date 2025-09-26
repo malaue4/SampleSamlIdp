@@ -262,11 +262,11 @@ module Saml
                 provider_id: entry.attribute("ProviderID")&.value,
                 name: entry.attribute("Name")&.value,
                 location: entry.attribute("Loc")&.value,
-              }
+              }.compact
             end,
             get_complete: scoping_element.at_xpath("samlp:IDPList/samlp:GetComplete", "samlp" => Namespaces::SAMLP)&.value
-          }
-        }
+          }.compact
+        }.compact
       end
     end
 

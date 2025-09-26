@@ -97,6 +97,7 @@ module Saml
     end
 
     def verify_signature(certificate)
+      certificate = OpenSSL::X509::Certificate.new(certificate) unless certificate.is_a? OpenSSL::X509::Certificate
       signed_document = Xmldsig::SignedDocument.new(raw_request)
       signed_document.validate(certificate)
     end

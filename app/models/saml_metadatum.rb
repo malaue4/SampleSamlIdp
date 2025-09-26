@@ -28,7 +28,7 @@ class SamlMetadatum < ApplicationRecord
         assertion_consumer_services: im.assertion_consumer_services,
         single_logout_services: im.single_logout_services,
         name_id_formats: im.name_id_formats,
-        signing_certificate: im.signing_certificate,
+        signing_certificate: "-----BEGIN CERTIFICATE-----\n#{im.signing_certificate}\n-----END CERTIFICATE-----\n",
         cert: im.signing_certificate,
         encryption_certificate: im.encryption_certificate,
         contact_person: im.contact_person,

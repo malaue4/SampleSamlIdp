@@ -1,7 +1,7 @@
 <% if @saml_idp_fail_msg %>
   <div id="saml_idp_fail_msg" class="flash error"><%= @saml_idp_fail_msg %></div>
 <% end %>
-<% user = User.last %>
+<% user = User.last || User.new %>
 <%= bootstrap_form_with model: user, url: saml_auth_path, method: :post do |f| %>
   <%= hidden_field_tag("SAMLRequest", params[:SAMLRequest]) %>
   <%= hidden_field_tag("RelayState", params[:RelayState]) %>

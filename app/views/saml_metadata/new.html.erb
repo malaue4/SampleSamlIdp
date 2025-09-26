@@ -1,11 +1,12 @@
 <% content_for :title, "New saml metadatum" %>
-
-<h1>New saml metadatum</h1>
+<% content_for :header do %>
+  <h1>New saml metadatum</h1>
+<% end %>
 
 <%= render "form", saml_metadatum: @saml_metadatum %>
 
-<br>
-
+<% content_for :footer do %>
 <div>
   <%= link_to "Back to saml metadata", saml_metadata_path %>
 </div>
+<% end %>

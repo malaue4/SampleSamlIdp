@@ -81,8 +81,43 @@
   XML
 %></code></pre>
 
+<pre><code><%=
+  full_sample_authn_request = <<~XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <samlp:AuthnRequest
+        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+        xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+        ID="_full12345"
+        Version="2.0"
+        IssueInstant="2025-01-01T12:00:00Z"
+        Destination="https://idp.example.com/saml/auth"
+        ForceAuthn="true"
+        IsPassive="false"
+        ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+        AssertionConsumerServiceURL="https://sp.example.com/saml/acs"
+        ProviderName="Example SP">
+      <saml:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://sp.example.com/metadata</saml:Issuer>
+      <saml:Subject>
+        <saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">user@example.com</saml:NameID>
+      </saml:Subject>
+      <samlp:NameIDPolicy
+          Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+          AllowCreate="true"/>
+      <saml:Conditions NotBefore="2025-01-01T12:00:00Z" NotOnOrAfter="2025-01-01T12:10:00Z"/>
+      <samlp:RequestedAuthnContext Comparison="exact">
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+      </samlp:RequestedAuthnContext>
+      <samlp:Scoping ProxyCount="1">
+        <samlp:IDPList>
+          <samlp:IDPEntry ProviderID="https://idp.example.com/metadata" Name="Example IdP"/>
+        </samlp:IDPList>
+      </samlp:Scoping>
+    </samlp:AuthnRequest>
+  XML
+%></code></pre>
+
 <%= tag.pre(
-      Saml::Request.parse(sample_authn_request).then do |req|
+      Saml::Request.parse(full_sample_authn_request).then do |req|
         %i[id version issue_instant destination consent issuer_entity_id force_authn? passive? protocol_binding assertion_consumer_service_index assertion_consumer_service_url attribute_consuming_service_index provider_name subject name_id_policy conditions requested_authn_context scoping].index_with { |meth| req.send(meth) }
-      end.to_yaml)
+      end.compact.to_yaml)
 %>

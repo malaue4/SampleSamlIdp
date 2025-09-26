@@ -55,7 +55,6 @@ group :development, :test do
   gem "better_errors", "~> 2.10"
 
   gem "binding_of_caller", "~> 1.0"
-
 end
 
 group :development do
@@ -77,6 +76,12 @@ gem "faker", "~> 3.4"
 
 gem "rubystats", "~> 0.4.1"
 
-gem "saml_idp", "~> 0.16.0"
+gem "saml_idp"
 
 gem "rouge", "~> 4.3"
+
+gem "xmldsig", "~> 0.7.0"
+
+
+gem 'minitest-rails'
+gem "ostruct", "~> 0.6.3"

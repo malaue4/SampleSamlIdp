@@ -7,6 +7,7 @@ module Saml
     protect_from_forgery
 
     before_action :validate_saml_request, only: [ :new, :create, :logout ]
+    skip_before_action :authenticate_user!
 
     def new
     end
@@ -90,6 +91,13 @@ module Saml
         @current_user ||= user_session&.user
       end
 
+      protected def validate_saml_request(raw_saml_request = params[:SAMLRequest])
+        decode_request(raw_saml_request)
+        return true if valid_saml_request?
+
+        false
+      end
+
       def encode_failure_response(idp_entity_id:, error:, saml_request_id: nil, destination: saml_acs_url)
         response_attributes = {}
         response_attributes[:ID] = "_#{SecureRandom.uuid}"
@@ -104,8 +112,7 @@ module Saml
         xml.instruct! :xml, version: "1.0", encoding: "UTF-8"
         xml.tag! :samlp, :Response, response_attributes do |res|
           res.Issuer idp_entity_id, xmlns: "urn:oasis:names:tc:SAML:2.0:assertion"
-          # Maybe this should be signed, but I'll be damned if I can unravel saml_idp gem enough to figure out how it does
-          # the signatures
+          build_signature_markup xml, response_attributes[:ID] if true # should sign response?
           res.tag! :samlp, :Status do |status|
             status.tag! :samlp, :StatusCode, Value: "urn:oasis:names:tc:SAML:2.0:status:Responder" do |code|
               code.tag! :samlp, :StatusCode, Value: "urn:oasis:names:tc:SAML:2.0:status:AuthnFailed"
@@ -114,8 +121,53 @@ module Saml
           end
         end
 
-        Base64.strict_encode64(xml.target!)
+        unsigned_xml = xml.target!
+
+        signed_xml = if true # sign_response?
+          Xmldsig::SignedDocument.new(unsigned_xml).sign(SamlIdp.config.secret_key)
+        else
+          unsigned_xml
+        end
+
+        Base64.strict_encode64(signed_xml)
       end
-      # rubocop:enable Metrics/AbcSize
+
+    SIGNATURE_ALGORITHMS = {
+      rsa_sha1: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+      rsa_sha256: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+      rsa_sha384: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384",
+      rsa_sha512: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
+      dsa_sha1: "http://www.w3.org/2000/09/xmldsig#dsa-sha1",
+      dsa_sha256: "http://www.w3.org/2009/xmldsig11#dsa-sha256"
+    }.freeze
+
+    # Builds an XML markup for a digital signature according to the XML DSig specification.
+    #
+    # This method constructs the XML structure required for signing data using
+    # a digital signature algorithm. It creates a "Signature" element containing
+    # "SignedInfo", "CanonicalizationMethod", "SignatureMethod", and "Reference" elements.
+    # The algorithm used for signing can be specified by the `signature_algorithm` parameter.
+    #
+    # Parameters:
+    # - xml: The Builder::XmlMarkup object used to generate XML.
+    # - reference_id: A unique identifier for the signature, inserted as the "Id" attribute of the "Signature" element.
+    # - signature_algorithm: A symbol representing the digital signature algorithm to use. Defaults to `:rsa_sha1`.
+    #
+    # Returns:
+    # - nil: XML markup is appended to the provided xml object, and no explicit value is returned.
+    def build_signature_markup(xml, reference_id, signature_algorithm: :rsa_sha1)
+      xml.dsig :Signature, Id: reference_id, xmlns: "http://www.w3.org/2000/09/xmldsig#" do |sig|
+        sig.dsig :SignedInfo, xmlns: "http://www.w3.org/2000/09/xmldsig#" do |signed_info|
+          signed_info.dsig :CanonicalizationMethod, Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+          signed_info.dsig :SignatureMethod, Algorithm: SIGNATURE_ALGORITHMS.fetch(signature_algorithm)
+          signed_info.dsig :Reference, URI: "##{reference_id}" do |reference|
+            reference.dsig :Transforms, xmlns: "http://www.w3.org/2000/09/xmldsig#" do |transforms|
+              transforms.dsig :Transform, Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+            end
+          end
+        end
+        sig.dsig :SignatureValue
+      end
+    end
   end
 end

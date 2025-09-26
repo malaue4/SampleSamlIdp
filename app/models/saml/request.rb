@@ -98,11 +98,7 @@ module Saml
 
     def verify_signature(certificate)
       signed_document = Xmldsig::SignedDocument.new(raw_request)
-      signed_document.validate(certificate) do |it|
-        pp it
-      end
-      pp signed_document.signatures
-      pp signed_document.signatures.first.instance_variable_get(:@errors)
+      signed_document.validate(certificate)
     end
 
     # The Extensions element of the request. This element contains optional metadata or additional elements

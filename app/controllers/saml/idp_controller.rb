@@ -12,11 +12,10 @@ module Saml
     skip_before_action :authenticate_user!
 
     def new
-      metadata = SamlMetadatum.find_by! entity_id: saml_request.issuer_entity_id
+      @metadata = SamlMetadatum.find_by! entity_id: saml_request.issuer_entity_id
 
-      if !saml_request.verify_signature(metadata.parsed_metadata.fetch(:signing_certificate))
-        raise "The signature is invalid!"
-      end
+      saml_request.metadata = @metadata
+      saml_request.validate!
     end
 
     def show

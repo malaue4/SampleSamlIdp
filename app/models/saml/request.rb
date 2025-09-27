@@ -2,13 +2,38 @@
 
 module Saml
   class Request
+    include ActiveModel::Model
+
     attr_reader :raw_request
+    attr_accessor :metadata
+
+    validates :raw_request, presence: true
+    validates :metadata, presence: { message: "is needed for most validations and for verifying signature" }
+    validates :id, presence: true
+    validates :version, presence: true, inclusion: { in: [ "2.0" ] }
+    validates :issue_instant, presence: true
+    #validates :destination, presence: { if: true }, inclusion: { in: proc { metadata&.acs_url } }
+    #validates :signature, presence: { if: proc { metadata&.wants_requests_signed? } }
+    validate :verify_signature, if: :signed?
+
 
     def self.parse(maybe_encoded_request)
       decoded_request = Encoding.decode_if_needed(maybe_encoded_request)
       raw_request = Compression.inflate_if_needed(decoded_request)
 
-      new(raw_request)
+      document = Nokogiri::XML(raw_request)
+      case document.at_xpath("/samlp:AuthnRequest | /samlp:AssertionIDRequest | /samlp:SubjectQuery | /samlp:ArtifactResolve | /samlp:ManageNameIDRequest | /samlp:LogoutRequest | /samlp:NameIDMappingRequest | /samlp:AuthnQuery", "samlp" => Namespaces::SAMLP).name
+      when "AuthnRequest" then AuthnRequest.new(raw_request)
+      when "LogoutRequest" then raise NotImplementedError
+      when "AssertionIDRequest" then raise NotImplementedError
+      when "SubjectQuery" then raise NotImplementedError
+      when "NameIDMappingRequest" then raise NotImplementedError
+      when "ManageNameIDRequest" then raise NotImplementedError
+      when "ArtifactResolve" then raise NotImplementedError
+      when "AuthnQuery" then raise NotImplementedError
+      else
+        new(raw_request)
+      end
     end
 
     def initialize(raw_request)
@@ -74,12 +99,22 @@ module Saml
       @consent ||= request_element.attribute('Consent')&.value
     end
 
+    def issuer_element
+      @issuer_element ||= request_element.at_xpath('saml:Issuer')
+    end
+
+    def issuer
+      return if issuer_element.blank?
+
+      @issuer ||= NameId.parse(issuer_element)
+    end
+
     # The entity ID of the issuer. It identifies the entity that issued the SAML request.
     # This is used to determine which set of metadata to use when validating the request.
     #
     # @return [String, nil]
     def issuer_entity_id
-      @issuer_entity_id ||= request_element.at_xpath('saml:Issuer')&.text
+      @issuer_entity_id ||= issuer&.value
     end
 
     # The Signature element of the request. This element contains the XML Signature
@@ -96,7 +131,8 @@ module Saml
       signature_element.present?
     end
 
-    def verify_signature(certificate)
+    def verify_signature(certificate = nil)
+      certificate ||= metadata.parsed_metadata.fetch(:signing_certificate)
       certificate = OpenSSL::X509::Certificate.new(certificate) unless certificate.is_a? OpenSSL::X509::Certificate
       signed_document = Xmldsig::SignedDocument.new(raw_request)
       signed_document.validate(certificate)
@@ -111,162 +147,6 @@ module Saml
     def extensions_element
       @extensions_element ||= request_element.at_xpath("samlp:Extensions", "samlp" => Namespaces::SAMLP)
     end
-
-    concerning :AuthnRequest do
-
-      def force_authn?
-        return unless request_element.name == "AuthnRequest"
-
-        @force_authn ||= request_element.attribute("ForceAuthn")&.value == "true"
-      end
-
-      def passive?
-        return unless request_element.name == "AuthnRequest"
-
-        @passive ||= request_element.attribute("IsPassive")&.value == "true"
-      end
-
-      def protocol_binding
-        return unless request_element.name == "AuthnRequest"
-
-        @protocol_binding ||= request_element.attribute("ProtocolBinding")&.value
-      end
-
-      def assertion_consumer_service_index
-        return unless request_element.name == "AuthnRequest"
-
-        @assertion_consumer_service_index ||= request_element.attribute("AssertionConsumerServiceIndex")&.value&.to_i
-      end
-
-      def assertion_consumer_service_url
-        return unless request_element.name == "AuthnRequest"
-
-        @assertion_consumer_service_url ||= request_element.attribute("AssertionConsumerServiceURL")&.value
-      end
-
-      def attribute_consuming_service_index
-        return unless request_element.name == "AuthnRequest"
-
-        @attribute_consuming_service_index ||= request_element.attribute("AttributeConsumingServiceIndex")&.value&.to_i
-      end
-
-      def provider_name
-        return unless request_element.name == "AuthnRequest"
-
-        @provider_name ||= request_element.attribute("ProviderName")&.value
-      end
-
-      def subject_element
-        return unless request_element.name == "AuthnRequest"
-
-        @subject_element ||= request_element.at_xpath("saml:Subject", "saml" => Namespaces::SAML)
-      end
-
-      def subject
-        return unless subject_element
-
-        # TODO: Implement SubjectConfirmation and SubjectConfirmationData
-
-        @subject ||= {
-          name_id: subject_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)&.text,
-          name_id_format: subject_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)&.attribute("Format")&.value,
-        }
-      end
-
-      def name_id_policy_element
-        return unless request_element.name == "AuthnRequest"
-
-        @name_id_policy_element ||= request_element.at_xpath("samlp:NameIDPolicy", "samlp" => Namespaces::SAMLP)
-      end
-
-      def name_id_policy
-        return if name_id_policy_element.nil?
-
-        @name_id_policy ||= {
-          format: name_id_policy_element&.attribute("Format")&.value,
-          sp_name_qualifier: name_id_policy_element&.attribute("SPNameQualifier")&.value,
-          allow_create: name_id_policy_element&.attribute("AllowCreate")&.value == "true"
-        }
-      end
-
-      def conditions_element
-        return unless request_element.name == "AuthnRequest"
-
-        @conditions_element ||= request_element.at_xpath("saml:Conditions", "saml" => Namespaces::SAML)
-      end
-
-      # Returns conditions extracted from the SAML request, including audience restrictions,
-      # one-time use indications, proxy restrictions, and time constraints. Conditions are
-      # parsed from the `<saml:Conditions>` element in the SAML request.
-      #
-      # - `audience_restrictions`: A list of audiences extracted from `<saml:AudienceRestriction>`.
-      # - `one_time_use`: A boolean indicating the presence of the `<saml:OneTimeUse>` element, used to
-      #   enforce that the assertion can only be used once.
-      # - `proxy_restriction`: Currently an empty array, intended for handling `<ProxyRestriction>` elements
-      #   in the future.
-      # - `not_before`: The `NotBefore` timestamp, extracted to indicate the earliest valid time for the assertion.
-      # - `not_on_or_after`: The `NotOnOrAfter` timestamp, extracted to indicate the latest valid time for the assertion.
-      #
-      # The method caches the parsed conditions for future use.
-      #
-      # @return [Hash] A hash representing the parsed conditions.
-      def conditions
-        return if conditions_element.nil?
-
-        @conditions ||= {
-          audience_restrictions: conditions_element
-            .xpath("saml:AudienceRestriction/saml:Audience", "saml" => Namespaces::SAML)
-            .map(&:text),
-          one_time_use: conditions_element.at_xpath("saml:OneTimeUse", "saml" => Namespaces::SAML).present?,
-          proxy_restriction: [], # TODO: It looks like this: `<ProxyRestriction Count="2"><Audience>https://www.example.com/sp</Audience></ProxyRestriction>`
-          not_before: conditions_element&.attribute("NotBefore")&.value,
-          not_on_or_after: conditions_element&.attribute("NotOnOrAfter")&.value,
-        }
-      end
-
-      def requested_authn_context_element
-        return unless request_element.name == "AuthnRequest"
-
-        @requested_authn_context_element ||= request_element.at_xpath("samlp:RequestedAuthnContext", "samlp" => Namespaces::SAMLP)
-      end
-
-      def requested_authn_context
-        return if requested_authn_context_element.nil?
-
-        @requested_authn_context ||= {
-          class_refs: requested_authn_context_element
-            .xpath("saml:AuthnContextClassRef", "saml" => Namespaces::SAML).map(&:text).presence,
-          decl_refs: requested_authn_context_element
-            .xpath("saml:AuthnContextDeclRef", "saml" => Namespaces::SAML).map(&:text).presence,
-          comparison: requested_authn_context_element.attribute("Comparison")&.value
-        }.compact
-      end
-
-      def scoping_element
-        return unless request_element.name == "AuthnRequest"
-
-        @scoping_element ||= request_element.at_xpath("samlp:Scoping", "samlp" => Namespaces::SAMLP)
-      end
-
-      def scoping
-        return if scoping_element.nil?
-
-        @scoping ||= {
-          proxy_count: scoping_element.attribute("ProxyCount")&.value&.to_i,
-          idp_list: {
-            entries: scoping_element.xpath("samlp:IDPList/samlp:IDPEntry", "samlp" => Namespaces::SAMLP).map do |entry|
-              {
-                provider_id: entry.attribute("ProviderID")&.value,
-                name: entry.attribute("Name")&.value,
-                location: entry.attribute("Loc")&.value,
-              }.compact
-            end,
-            get_complete: scoping_element.at_xpath("samlp:IDPList/samlp:GetComplete", "samlp" => Namespaces::SAMLP)&.value
-          }.compact
-        }.compact
-      end
-    end
-
 
     module Compression
       extend self
@@ -319,6 +199,20 @@ module Saml
 
       def encode(request)
         Base64.strict_encode64(request)
+      end
+    end
+
+    module Encryption
+      extend self
+
+      def decrypt(request, decryption_key)
+        encrypted_document = Xmlenc::EncryptedDocument.new(request)
+        encrypted_document.decrypt(decryption_key)
+      end
+
+      def encrypt_element(element, encryption_key)
+        encrypted_document = Xmlenc::EncryptedData
+        encrypted_document.encrypt(encryption_key)
       end
     end
   end

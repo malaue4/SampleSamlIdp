@@ -389,6 +389,7 @@ DEPENDENCIES
   tzinfo-data
   web-console
   xmldsig (~> 0.7.0)
+  xmlenc (~> 0.8.0)
 
 BUNDLED WITH
    2.7.2

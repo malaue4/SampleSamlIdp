@@ -85,3 +85,5 @@ gem "xmldsig", "~> 0.7.0"
 
 gem 'minitest-rails'
 gem "ostruct", "~> 0.6.3"
+
+gem "xmlenc", "~> 0.8.0"

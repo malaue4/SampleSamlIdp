@@ -1,4 +1,12 @@
-<% if @saml_idp_fail_msg %>
+<% content_for :header do %>
+  Authenticating
+<% end %>
+
+<p>
+  <%= @saml_request.provider_name || @metadata.parsed_metadata[:display_name] %> would like to know more about you.
+</p>
+
+<% if @saml_idp_fail_msg %>G
   <div id="saml_idp_fail_msg" class="flash error"><%= @saml_idp_fail_msg %></div>
 <% end %>
 <% user = User.last || User.new %>

@@ -4,7 +4,7 @@ module Saml
   class NameId
     include ActiveModel::Model
 
-    attr_reader :value, :format, :sp_provided_id, :name_qualifier, :sp_name_qualifier
+    attr_accessor :value, :format, :sp_provided_id, :name_qualifier, :sp_name_qualifier
 
     def self.parse(name_id_element)
       new(

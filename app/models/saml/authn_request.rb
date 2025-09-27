@@ -76,53 +76,14 @@ module Saml
       def subject
         return unless subject_element
 
-        # TODO: Implement SubjectConfirmation and SubjectConfirmationData
-
         @subject ||= {
           name_id: subject_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)
             &.then { |name_id_element| NameId.parse(name_id_element) },
-          subject_confirmations: subject_element.xpath("saml:SubjectConfirmation", "saml" => Namespaces::SAML),
+          subject_confirmations: subject_element
+            .xpath("saml:SubjectConfirmation", "saml" => Namespaces::SAML)
+            .map { |subject_confirmation_element| SubjectConfirmation.parse(subject_confirmation_element) },
         }
       end
-
-    class SubjectConfirmation
-      include ActiveModel::Model
-
-      attr_reader :name_id, :subject_confirmation_data, :method
-
-      def self.parse(subject_confirmation_element)
-        new(
-          method: subject_confirmation_element.attribute("Method")&.value,
-          name_id: subject_confirmation_element
-            .at_xpath("saml:NameID", "saml" => Namespaces::SAML)
-            &.then { |name_id_element| NameId.parse(name_id_element) },
-          subject_confirmation_data: subject_confirmation_element
-            .at_xpath("saml:SubjectConfirmationData", "saml" => Namespaces::SAML)
-            &.then { |subject_confirmation_data_element| SubjectConfirmationData.parse(subject_confirmation_data_element) }
-        )
-      end
-    end
-
-    class SubjectConfirmationData
-      include ActiveModel::Model
-
-      attr_reader :not_before, :not_on_or_after, :recipient, :in_response_to, :address, :data
-
-      # @param [Nokogiri::XML::Node] subject_confirmation_data_element
-      def self.parse(subject_confirmation_data_element)
-        new(
-          not_before: subject_confirmation_data_element.attribute("NotBefore")&.value&.to_time,
-          not_on_or_after: subject_confirmation_data_element.attribute("NotOnOrAfter")&.value&.to_time,
-          recipient: subject_confirmation_data_element.attribute("Recipient")&.value,
-          in_response_to: subject_confirmation_data_element.attribute("InResponseTo")&.value,
-          address: subject_confirmation_data_element.attribute("Address")&.value,
-          data: {
-            attributes: subject_confirmation_data_element.attributes,
-            elements: subject_confirmation_data_element.elements
-          }
-        )
-      end
-    end
 
       def name_id_policy_element
         @name_id_policy_element ||= request_element.at_xpath("samlp:NameIDPolicy", "samlp" => Namespaces::SAMLP)

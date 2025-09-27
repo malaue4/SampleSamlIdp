@@ -23,8 +23,8 @@ module Saml
 
       document = Nokogiri::XML(raw_request)
       case document.at_xpath("/samlp:AuthnRequest | /samlp:AssertionIDRequest | /samlp:SubjectQuery | /samlp:ArtifactResolve | /samlp:ManageNameIDRequest | /samlp:LogoutRequest | /samlp:NameIDMappingRequest | /samlp:AuthnQuery", "samlp" => Namespaces::SAMLP).name
-      when "AuthnRequest" then AuthnRequest.new(raw_request)
-      when "LogoutRequest" then raise NotImplementedError
+      when "AuthnRequest" then AuthnRequest.new(raw_request:)
+      when "LogoutRequest" then LogoutRequest.new(raw_request:)
       when "AssertionIDRequest" then raise NotImplementedError
       when "SubjectQuery" then raise NotImplementedError
       when "NameIDMappingRequest" then raise NotImplementedError
@@ -32,11 +32,12 @@ module Saml
       when "ArtifactResolve" then raise NotImplementedError
       when "AuthnQuery" then raise NotImplementedError
       else
-        new(raw_request)
+        new(raw_request:)
       end
     end
 
-    def initialize(raw_request)
+    def initialize(raw_request:, **attributes)
+      super(attributes)
       @raw_request = raw_request
     end
 
@@ -208,6 +209,10 @@ module Saml
       def decrypt(request, decryption_key)
         encrypted_document = Xmlenc::EncryptedDocument.new(request)
         encrypted_document.decrypt(decryption_key)
+      end
+
+      def needs_decryption?(request)
+        request.match?(/<(\w+:)?EncryptedData/)
       end
 
       def encrypt_element(element, encryption_key)

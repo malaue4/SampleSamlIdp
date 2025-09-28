@@ -55,6 +55,8 @@ group :development, :test do
   gem "better_errors", "~> 2.10"
 
   gem "binding_of_caller", "~> 1.0"
+
+  gem 'minitest-rails'
 end
 
 group :development do
@@ -82,8 +84,6 @@ gem "rouge", "~> 4.3"
 
 gem "xmldsig", "~> 0.7.0"
 
-
-gem 'minitest-rails'
 gem "ostruct", "~> 0.6.3"
 
 gem "xmlenc", "~> 0.8.0"

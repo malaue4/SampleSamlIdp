@@ -2,7 +2,7 @@
 
 module Saml
   module Metadata
-    class SPSSODescriptor < SSODescriptor
+    class ServiceProviderSingleSignOnDescriptor < SingleSignOnDescriptor
 
 
       def authn_requests_signed?

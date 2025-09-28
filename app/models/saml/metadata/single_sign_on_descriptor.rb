@@ -2,7 +2,7 @@
 
 module Saml
   module Metadata
-    class SSODescriptor < RoleDescriptor
+    class SingleSignOnDescriptor < RoleDescriptor
 
 
       def artifact_resolution_services
@@ -35,6 +35,15 @@ module Saml
           .map do |service|
           service.text
         end
+      end
+
+      def as_json
+        super.merge!(
+          artifact_resolution_services:,
+          single_logout_services:,
+          manage_name_id_services:,
+          name_id_formats:,
+        )
       end
     end
   end

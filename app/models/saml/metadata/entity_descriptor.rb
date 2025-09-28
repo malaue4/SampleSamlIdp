@@ -3,7 +3,7 @@ module Saml
     class EntityDescriptor
       include ActiveModel::Model
 
-      attr_reader :raw_xml, :entity_id
+      attr_accessor :raw_xml, :entity_id
 
       validates :cache_duration, presence:  { if: proc { |ed| ed.root? && ed.valid_until.nil? } }
       validates :valid_until, presence:  { if: proc { |ed| ed.root? && ed.cache_duration.nil? } }

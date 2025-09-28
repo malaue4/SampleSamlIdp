@@ -2,7 +2,7 @@
 
 module Saml
   module Metadata
-    class IDPSSODescriptor < SSODescriptor
+    class IdentityProviderSingleSignOnDescriptor < SingleSignOnDescriptor
 
 
       def want_authn_requests_signed?
@@ -47,6 +47,17 @@ module Saml
           .map do |attribute|
           Attribute.parse(attribute)
         end
+      end
+
+      def as_json
+        super.merge!(
+          want_authn_requests_signed?: want_authn_requests_signed?,
+          single_sign_on_services:,
+          name_id_mapping_services:,
+          assertion_id_request_services:,
+          attribute_profiles:,
+          attributes:,
+        )
       end
     end
   end

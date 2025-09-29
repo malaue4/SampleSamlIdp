@@ -4,9 +4,10 @@ module Saml
   class Attribute
     include ActiveModel::Model
     include ActiveModel::Attributes
+    include ToXml
 
     attribute(:name)
-    attribute(:name_format)
+    attribute(:name_format, default: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri")
     attribute(:friendly_name)
     attribute(:attribute_value)
 
@@ -48,5 +49,20 @@ module Saml
         attribute_value_element.text
       end
     end
+
+    private
+
+      def xml_namespace
+        "saml"
+      end
+
+      def xml_attributes
+        { Name: name, NameFormat: name_format, FriendlyName: friendly_name }.compact
+      end
+
+      def xml_content(builder)
+        # TODO: AttributeValue can be a complex type
+        Array(attribute_value).compact.each { |av| builder["saml"].AttributeValue { builder.text(av) } }
+      end
   end
 end

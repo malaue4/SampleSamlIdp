@@ -11,6 +11,16 @@ module Saml
           attributes[:required] = name_id_element.attribute("isRequired")&.value == "true"
         end
       end
+
+      private
+
+        def xml_attributes
+          super.merge(isRequired: required)
+        end
+
+        def xml_namespace
+          "md"
+        end
     end
   end
 end

@@ -4,14 +4,15 @@ module Saml
   module Metadata
     class AttributeConsumingService
       include ActiveModel::Model
+      include ActiveModel::Attributes
+      include ToXml
 
-      attr_accessor(
-        :service_name,
-        :service_description,
-        :requested_attributes,
-        :index,
-        :default
-      )
+
+      attribute :service_name
+      attribute :service_description
+      attribute :requested_attributes
+      attribute :index, :integer, default: 1
+      attribute :default, :boolean, default: false
 
 
       # @param [Nokogiri::XML::Node] attribute_consuming_service_element
@@ -31,12 +32,25 @@ module Saml
         )
       end
 
-      # @param [Nokogiri::XML::Builder] builder
-      def to_xml(builder)
-        builder.AttributeConsumingService do
+      private
 
+        def xml_namespace
+          "md"
         end
-      end
+
+        def xml_attributes
+          { index:, isDefault: default }
+        end
+
+        def xml_content(builder)
+          service_name&.each do |lang, value|
+            builder.ServiceName("xml:lang" => lang) { builder.text(value) }
+          end
+          service_description&.each do |lang, value|
+            builder.ServiceDescription("xml:lang" => lang) { builder.text(value) }
+          end
+          requested_attributes&.each { |requested_attribute| requested_attribute.build_xml(builder) }
+        end
     end
   end
 end

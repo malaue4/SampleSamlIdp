@@ -4,7 +4,7 @@ module Saml
   module Metadata
     class RequestedAttribute < Attribute
 
-      attr_accessor :required
+      attribute :required, :boolean, default: false
 
       def self.parse(name_id_element)
         super(name_id_element) do |attributes|

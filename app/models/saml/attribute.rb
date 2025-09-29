@@ -3,8 +3,12 @@
 module Saml
   class Attribute
     include ActiveModel::Model
+    include ActiveModel::Attributes
 
-    attr_accessor :name, :name_format, :friendly_name, :attribute_value
+    attribute(:name)
+    attribute(:name_format)
+    attribute(:friendly_name)
+    attribute(:attribute_value)
 
     # @param [Nokogiri::XML::Node] attribute_element
     def self.parse(attribute_element)

@@ -19,10 +19,10 @@ module Saml
         new(
           service_name: attribute_consuming_service_element
             .xpath("md:ServiceName", "md" => Namespaces::MD)
-            .to_h { |sn| [sn.attribute("xml:lang")&.value, sn.text] },
+            .to_h { |sn| [sn.attribute_with_ns("lang", Namespaces::XML)&.value, sn.text] },
           service_description: attribute_consuming_service_element
             .xpath("md:ServiceDescription", "md" => Namespaces::MD)
-            .to_h { |sn| [sn.attribute("xml:lang")&.value, sn.text] },
+            .to_h { |sn| [sn.attribute_with_ns("lang", Namespaces::XML)&.value, sn.text] },
           requested_attributes: attribute_consuming_service_element
             .xpath("md:RequestedAttribute", "md" => Namespaces::MD)
             .map { |rae| RequestedAttribute.parse(rae) },
@@ -31,7 +31,12 @@ module Saml
         )
       end
 
+      # @param [Nokogiri::XML::Builder] builder
+      def to_xml(builder)
+        builder.AttributeConsumingService do
 
+        end
+      end
     end
   end
 end

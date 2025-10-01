@@ -80,7 +80,7 @@ gem "rubystats", "~> 0.4.1"
 
 gem "saml_idp"
 
-gem "rouge", "~> 4.3"
+gem "rouge", "~> 4.6"
 
 gem "xmldsig", "~> 0.7.0"
 

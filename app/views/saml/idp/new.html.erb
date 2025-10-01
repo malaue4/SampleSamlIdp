@@ -1,7 +1,15 @@
-<% if @saml_idp_fail_msg %>
+<% content_for :header do %>
+  Authenticating
+<% end %>
+
+<p>
+  <%= @saml_request.provider_name || @metadata.parsed_metadata[:display_name] %> would like to know more about you.
+</p>
+
+<% if @saml_idp_fail_msg %>G
   <div id="saml_idp_fail_msg" class="flash error"><%= @saml_idp_fail_msg %></div>
 <% end %>
-<% user = User.last %>
+<% user = User.last || User.new %>
 <%= bootstrap_form_with model: user, url: saml_auth_path, method: :post do |f| %>
   <%= hidden_field_tag("SAMLRequest", params[:SAMLRequest]) %>
   <%= hidden_field_tag("RelayState", params[:RelayState]) %>
@@ -9,4 +17,5 @@
   <%= f.text_field :password, floating: true, value: user.notes["password"] %>
 
   <%= f.primary "Sign in" %>
+  <%= submit_tag("Cancel", class: "btn btn-danger") %>
 <% end %>

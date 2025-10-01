@@ -1,0 +1,5 @@
+<%= form_tag(saml_logout_url, onload: "document.forms[0].submit()") do %>
+  <%= hidden_field_tag("SAMLResponse", @saml_response) %>
+  <%= hidden_field_tag("RelayState", params[:RelayState]) %>
+  <%= submit_tag "Submit" %>
+<% end %>

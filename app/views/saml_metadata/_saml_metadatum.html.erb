@@ -20,13 +20,45 @@
   </p>
 
   <div class="card">
-    <strong class="card-header">Metadata:</strong>
-    <%
-      source = Nokogiri::XML(saml_metadatum.config["raw"]).to_xml
-      formatter = Rouge::Formatters::HTMLLineTable.new Rouge::Formatters::HTML.new
-      lexer = Rouge::Lexers::XML.new
-    %>
-    <pre class="card-body m-0 highlight"><%= raw formatter.format(lexer.lex(source)) %></pre>
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <button class="nav-link" type="button"
+             data-bs-toggle="tab" data-bs-target="#<%= dom_id saml_metadatum %>-raw"
+          >
+            Raw Metadata
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link active" type="button"
+                  data-bs-toggle="tab" data-bs-target="#<%= dom_id saml_metadatum %>-parsed">
+            Parsed Metadata
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content">
+        <div class="tab-pane" id="<%= dom_id saml_metadatum %>-raw">
+          <%
+            source = Nokogiri::XML(saml_metadatum.config["raw"]).to_xml
+            formatter = Rouge::Formatters::HTMLLineTable.new Rouge::Formatters::HTML.new
+            lexer = Rouge::Lexers::XML.new
+          %>
+          <pre class="m-0 highlight"><%= raw formatter.format(lexer.lex(source)) %></pre>
+        </div>
+        <div class="tab-pane active" id="<%= dom_id saml_metadatum %>-parsed">
+          <%= image_tag(saml_metadatum.parsed_metadata[:logo], class: "img-fluid") if saml_metadatum.parsed_metadata[:logo] %>
+          <%= debug saml_metadatum.parsed_metadata %>
+          <% cert_url = "about:certificate?" %>
+          <% cert_url += { cert: saml_metadatum.parsed_metadata[:signing_certificate] }.to_query %>
+          <%= link_to "Signing Certificate", cert_url %>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="tab-content"></div>
     <style><%= Rouge::Themes::Pastie.render %></style>
   </div>
 

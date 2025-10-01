@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.2.0.beta2"
+gem "rails", "~> 7.2.0"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 # Use postgresql as the database for Active Record
@@ -56,6 +56,7 @@ group :development, :test do
 
   gem "binding_of_caller", "~> 1.0"
 
+  gem 'minitest-rails'
 end
 
 group :development do
@@ -77,6 +78,12 @@ gem "faker", "~> 3.4"
 
 gem "rubystats", "~> 0.4.1"
 
-gem "saml_idp", "~> 0.16.0"
+gem "saml_idp"
 
 gem "rouge", "~> 4.3"
+
+gem "xmldsig", "~> 0.7.0"
+
+gem "ostruct", "~> 0.6.3"
+
+gem "xmlenc", "~> 0.8.0"

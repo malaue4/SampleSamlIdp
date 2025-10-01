@@ -177,16 +177,18 @@ CERT
   # `identifier` is the entity_id or issuer of the Service Provider,
   # settings is an IncomingMetadata object which has a to_h method that needs to be persisted
   config.service_provider.metadata_persister = ->(identifier, settings) {
-    metadatum = SamlMetadatum.find_or_initialize_by(entity_id: identifier)
-    metadatum.config = settings || {}
-    metadatum.save!
+    metadatum = SamlMetadatum.find_by!(entity_id: identifier)
+    metadatum.metadata_url ||= "settings.metadata_url"
+    metadatum.config ||= settings.to_h || {}
+    # metadatum.save!
   }
 
   # `identifier` is the entity_id or issuer of the Service Provider,
   # `service_provider` is a ServiceProvider object. Based on the `identifier` or the
   # `service_provider` you should return the settings.to_h from above
   config.service_provider.persisted_metadata_getter = ->(identifier, service_provider){
-    SamlMetadatum.find_by(entity_id: identifier)&.config || service_provider.refresh_metadata || SamlMetadatum.find_by(entity_id: identifier)&.config
+    data = SamlMetadatum.find_by!(entity_id: identifier)
+    data.parsed_metadata
   }
 
   # Find ServiceProvider metadata_url and fingerprint based on our settings

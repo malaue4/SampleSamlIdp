@@ -1,8 +1,10 @@
 <%= render @saml_metadatum %>
 
-<div>
-  <%= link_to "Edit this saml metadatum", edit_saml_metadatum_path(@saml_metadatum) %> |
-  <%= link_to "Back to saml metadata", saml_metadata_path %>
+<% content_for :footer do %>
+<div class="hstack gap-1">
+  <%= link_to "Edit this saml metadatum", edit_saml_metadatum_path(@saml_metadatum), class: "btn btn-primary" %> |
+  <%= link_to "Back to saml metadata", saml_metadata_path, class: "btn btn-secondary" %>
 
-  <%= button_to "Destroy this saml metadatum", @saml_metadatum, method: :delete %>
+  <%= button_to "Destroy this saml metadatum", @saml_metadatum, method: :delete, class: "btn btn-danger" %>
 </div>
+<% end %>

@@ -4,9 +4,6 @@ class Filter
   include ActiveModel::Model
   include ActiveModel::Attributes
 
-  attribute :name, :string
-  attribute :email, :string
-  attribute :phone, :string
   attribute :created_after, :datetime
   attribute :created_before, :datetime
 

@@ -12,8 +12,9 @@ module Saml
     skip_before_action :authenticate_user!
 
     def new
-      @metadata = SamlMetadatum.find_by! entity_id: saml_request.issuer_entity_id
+      @metadata = SamlMetadatum.find_by entity_id: saml_request&.issuer_entity_id
 
+      return unless @metadata
       saml_request.metadata = @metadata
       saml_request.validate!
     end

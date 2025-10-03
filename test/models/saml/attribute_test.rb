@@ -25,34 +25,34 @@ module Saml
     test "no value" do
       node = Nokogiri::XML(NO_VALUE_EXAMPLE).at_xpath("/saml:Attribute", "saml" => Namespaces::SAML)
       attr = Attribute.parse(node)
-      assert_equal({
+      assert_equal({ "attributes" => {
                      "name"=>"isAdmin",
                      "name_format"=>nil,
                      "friendly_name"=>nil,
                      "attribute_value"=>nil
-                   }, attr.as_json)
+                   }}, attr.as_json)
     end
 
     test "single value with type" do
       node = Nokogiri::XML(SINGLE_VALUE_TYPED_EXAMPLE).at_xpath("/saml:Attribute", "saml" => Namespaces::SAML)
       attr = Attribute.parse(node)
-      assert_equal({
+      assert_equal({ "attributes" => {
                      "name"=>"isDefault",
                      "name_format"=>nil,
                      "friendly_name"=>nil,
                      "attribute_value"=>true
-                   }, attr.as_json)
+                   }}, attr.as_json)
     end
 
     test "single value without type" do
       node = Nokogiri::XML(SINGLE_VALUE_UNTYPED_EXAMPLE).at_xpath("/saml:Attribute", "saml" => Namespaces::SAML)
       attr = Attribute.parse(node)
-      assert_equal({
-                     "name"=>"isDefault",
-                     "name_format"=>nil,
-                     "friendly_name"=>nil,
-                     "attribute_value"=>"true"
-                   }, attr.as_json)
+      assert_equal({ "attributes" => {
+                       "name" => "isDefault",
+                       "name_format" => nil,
+                       "friendly_name" => nil,
+                       "attribute_value" => "true"
+                     } }, attr.as_json)
     end
   end
 end

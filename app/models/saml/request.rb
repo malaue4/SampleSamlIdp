@@ -22,6 +22,14 @@ module Saml
       raw_request = Compression.inflate_if_needed(decoded_request)
 
       document = Nokogiri::XML(raw_request)
+      errors = Dir.chdir(File.join(Rails.root, "public")) do
+        schema = Nokogiri::XML::Schema(File.read(File.join(Rails.root, "public", "saml-schema-protocol-2.0.xsd")))
+        schema.validate document
+      end
+      if errors.any?
+        Rails.logger.error "Error validating SAML request: #{errors.join(", ")}"
+        raise errors.join(", ")
+      end
       case document.at_xpath("/samlp:AuthnRequest | /samlp:AssertionIDRequest | /samlp:SubjectQuery | /samlp:ArtifactResolve | /samlp:ManageNameIDRequest | /samlp:LogoutRequest | /samlp:NameIDMappingRequest | /samlp:AuthnQuery", "samlp" => Namespaces::SAMLP).name
       when "AuthnRequest" then AuthnRequest.new(raw_request:)
       when "LogoutRequest" then LogoutRequest.new(raw_request:)
@@ -166,9 +174,11 @@ module Saml
       def inflate(request)
         zstream = Zlib::Inflate.new(-Zlib::MAX_WBITS)
         begin
-          zstream.inflate(request)
+          zstream.inflate(request).tap { zstream.finish }
+        rescue Zlib::Error => e
+          Rails.logger.error "Error inflating SAML request: #{e.message}"
+          request
         ensure
-          zstream.finish
           zstream.close
         end
       end

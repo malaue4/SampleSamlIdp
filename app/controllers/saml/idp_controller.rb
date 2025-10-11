@@ -179,6 +179,8 @@ module Saml
 
       def require_saml_request
         @saml_request = Request.parse(params.require(:SAMLRequest))
+      rescue Request::SchemaError => e
+        @saml_idp_fail_msg = e.message
       end
   end
 end

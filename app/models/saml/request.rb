@@ -3,17 +3,33 @@
 module Saml
   class Request
     include ActiveModel::Model
+    include ActiveModel::Attributes
+    include ToXml
+
+    Error = Class.new(StandardError)
+    SchemaError = Class.new(Error)
 
     attr_reader :raw_request
+    # @!attribute [r] metadata
+    #   @return [Saml::Metadata::EntityDescriptor] the metadata for the entity that sent the request
     attr_accessor :metadata
+
+    attribute :id, :string
+    attribute :version, :string
+    attribute :issue_instant, :string
+    attribute :destination, :string
+    attribute :consent, :string
+    attribute :issuer, :string
+    attribute :signature, :string
+    attribute :extensions, :string
 
     validates :raw_request, presence: true
     validates :metadata, presence: { message: "is needed for most validations and for verifying signature" }
     validates :id, presence: true
     validates :version, presence: true, inclusion: { in: [ "2.0" ] }
     validates :issue_instant, presence: true
-    #validates :destination, presence: { if: true }, inclusion: { in: proc { metadata&.acs_url } }
-    #validates :signature, presence: { if: proc { metadata&.wants_requests_signed? } }
+    validates :destination, presence: { if: true }, inclusion: { in: proc { metadata } }
+    validates :signature, presence: { if: proc { metadata&.wants_requests_signed? } }
     validate :verify_signature, if: :signed?
 
 
@@ -28,7 +44,7 @@ module Saml
       end
       if errors.any?
         Rails.logger.error "Error validating SAML request: #{errors.join(", ")}"
-        raise errors.join(", ")
+        raise SchemaError, errors.join("\n")
       end
       case document.at_xpath("/samlp:AuthnRequest | /samlp:AssertionIDRequest | /samlp:SubjectQuery | /samlp:ArtifactResolve | /samlp:ManageNameIDRequest | /samlp:LogoutRequest | /samlp:NameIDMappingRequest | /samlp:AuthnQuery", "samlp" => Namespaces::SAMLP).name
       when "AuthnRequest" then AuthnRequest.new(raw_request:)
@@ -156,6 +172,36 @@ module Saml
     def extensions_element
       @extensions_element ||= request_element.at_xpath("samlp:Extensions", "samlp" => Namespaces::SAMLP)
     end
+
+    private
+
+      def valid_destinations
+        if true # Request is sent by the SP
+          metadata.idp_sso_descriptor&.single_sign_on_services&.map(&:location)
+        elsif true # Request is sent by the IDP
+          metadata.sp_sso_descriptor&.assertion_consumer_services&.map(&:location)
+        else
+          []
+        end
+      end
+
+      def xml_attributes
+        super.merge!(
+          ID: id,
+          Version: version,
+          IssueInstant: issue_instant,
+          Destination: destination,
+          Consent: consent,
+        ).compact
+      end
+
+      def xml_namespace
+        { href: Namespaces::SAMLP, prefix: "samlp" }
+      end
+
+      def xml_content(builder)
+        super
+      end
 
     module Compression
       extend self

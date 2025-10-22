@@ -25,7 +25,7 @@ module Saml
     private
 
       def xml_namespace
-        "saml"
+        { href: Namespaces::SAML, prefix: "saml" }
       end
 
       def xml_attributes

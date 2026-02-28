@@ -19,7 +19,7 @@ module Saml
         end
 
         def xml_namespace
-          "md"
+          { href: Namespaces::MD, prefix: "md" }
         end
     end
   end

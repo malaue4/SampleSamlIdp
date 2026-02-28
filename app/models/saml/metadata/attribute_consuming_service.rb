@@ -35,7 +35,7 @@ module Saml
       private
 
         def xml_namespace
-          "md"
+          { href: Namespaces::MD, prefix: "md" }
         end
 
         def xml_attributes

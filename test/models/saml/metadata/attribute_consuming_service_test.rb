@@ -71,7 +71,7 @@ module Saml
         )
         assert_equal("test@localhost", acs.requested_attributes[0].attribute_value)
         doc = Nokogiri::XML::Builder.new do |builder|
-          acs.build_xml(builder, "xmlns:md" => Namespaces::MD, "xmlns:saml" => Namespaces::SAML)
+          acs.build_xml(builder)
         end
 
         assert_equal(<<~XML, doc.to_xml)

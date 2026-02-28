@@ -13,6 +13,7 @@ module Saml
         @want_assertions_signed ||= role_descriptor_element.attribute("WantAssertionsSigned")&.value == "true"
       end
 
+      # @return [Array<Saml::Metadata::AssertionConsumerService>]
       def assertion_consumer_services
         @assertion_consumer_services ||= role_descriptor_element
           .xpath("md:AssertionConsumerService", "md" => Namespaces::MD)

@@ -1,6 +1,6 @@
 class SamlMetadatum < ApplicationRecord
   validates :entity_id, presence: true, uniqueness: true
-  validates :metadata_url, presence: true
+  #validates :metadata_url, presence: true
 
   before_validation do
     refresh_metadata if metadata_url.present? && metadata_url_changed?

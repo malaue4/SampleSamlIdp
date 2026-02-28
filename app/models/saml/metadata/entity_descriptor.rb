@@ -36,6 +36,17 @@ module Saml
         end
       end
 
+
+      # @return [Saml::Metadata::ServiceProviderSingleSignOnDescriptor, nil]
+      def sp_sso_descriptor
+        @sp_sso_descriptor ||= role_descriptor_elements.find { |rd| rd.is_a?(ServiceProviderSingleSignOnDescriptor) }
+      end
+
+      # @return [Saml::Metadata::IdentityProviderSingleSignOnDescriptor, nil]
+      def idp_sso_descriptor
+        @idp_sso_descriptor ||= role_descriptor_elements.find { |rd| rd.is_a?(IdentityProviderSingleSignOnDescriptor) }
+      end
+
       def affiliation_descriptor_element
         @affiliation_descriptor_element ||= entity_descriptor_element
           .at_xpath("md:AffiliationDescriptor", "md" => Namespaces::MD)

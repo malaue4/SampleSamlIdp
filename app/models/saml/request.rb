@@ -44,6 +44,7 @@ module Saml
       end
       if errors.any?
         Rails.logger.error "Error validating SAML request: #{errors.join(", ")}"
+        puts raw_request
         raise SchemaError, errors.join("\n")
       end
       case document.at_xpath("/samlp:AuthnRequest | /samlp:AssertionIDRequest | /samlp:SubjectQuery | /samlp:ArtifactResolve | /samlp:ManageNameIDRequest | /samlp:LogoutRequest | /samlp:NameIDMappingRequest | /samlp:AuthnQuery", "samlp" => Namespaces::SAMLP).name
@@ -121,11 +122,11 @@ module Saml
     #
     # @return [String, nil]
     def consent
-      @consent ||= request_element.attribute('Consent')&.value
+      @consent ||= request_element["Consent"]
     end
 
     def issuer_element
-      @issuer_element ||= request_element.at_xpath('saml:Issuer')
+      @issuer_element ||= request_element.at_xpath("saml:Issuer", "saml" => Namespaces::SAML)
     end
 
     def issuer

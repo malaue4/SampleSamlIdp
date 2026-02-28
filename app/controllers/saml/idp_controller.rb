@@ -80,11 +80,19 @@ module Saml
 
     def idp_make_saml_failure_response(error: "Something went wrong")
       # NOTE encryption is optional
-      encode_failure_response idp_entity_id: SamlIdp.config.entity_id, error:, saml_request_id: saml_request&.request_id
+      encode_failure_response idp_entity_id: SamlIdp.config.entity_id,
+                              error:,
+                              saml_request_id: saml_request&.id,
+                              destination: service_provider.assertion_consumer_service_url
     end
-    protected :idp_make_saml_response
+    protected :idp_make_saml_failure_response
 
     private
+
+      def service_provider
+        @service_provider ||= SamlMetadatum.find_by! entity_id: saml_request&.issuer_entity_id
+      end
+      helper_method :service_provider
 
       def user_params
         params.fetch(:user, {}).permit(:username, :password)
@@ -131,7 +139,10 @@ module Saml
         unsigned_xml = xml.target!
 
         signed_xml = if true # sign_response?
-          Xmldsig::SignedDocument.new(unsigned_xml).sign(SamlIdp.config.secret_key)
+          sd = Xmldsig::SignedDocument.new(unsigned_xml)
+          signing_key = SamlIdp.config.secret_key
+          puts signing_key
+          sd.sign(OpenSSL::PKey.read signing_key, "curse you perry the platypus")
         else
           unsigned_xml
         end
@@ -163,17 +174,19 @@ module Saml
     # Returns:
     # - nil: XML markup is appended to the provided xml object, and no explicit value is returned.
     def build_signature_markup(xml, reference_id, signature_algorithm: :rsa_sha1)
-      xml.dsig :Signature, Id: reference_id, xmlns: "http://www.w3.org/2000/09/xmldsig#" do |sig|
-        sig.dsig :SignedInfo, xmlns: "http://www.w3.org/2000/09/xmldsig#" do |signed_info|
-          signed_info.dsig :CanonicalizationMethod, Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-          signed_info.dsig :SignatureMethod, Algorithm: SIGNATURE_ALGORITHMS.fetch(signature_algorithm)
-          signed_info.dsig :Reference, URI: "##{reference_id}" do |reference|
-            reference.dsig :Transforms, xmlns: "http://www.w3.org/2000/09/xmldsig#" do |transforms|
-              transforms.dsig :Transform, Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
+      xml.ds :Signature, "xmlns:ds": "http://www.w3.org/2000/09/xmldsig#" do |sig|
+        sig.ds :SignedInfo do |signed_info|
+          signed_info.ds :CanonicalizationMethod, Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
+          signed_info.ds :SignatureMethod, Algorithm: SIGNATURE_ALGORITHMS.fetch(signature_algorithm)
+          signed_info.ds :Reference, URI: "##{reference_id}" do |reference|
+            reference.ds :Transforms do |transforms|
+              transforms.ds :Transform, Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
             end
+            reference.ds :DigestMethod, Algorithm: "http://www.w3.org/2001/04/xmlenc#sha256"
+            reference.ds :DigestValue
           end
         end
-        sig.dsig :SignatureValue
+        sig.ds :SignatureValue
       end
     end
 

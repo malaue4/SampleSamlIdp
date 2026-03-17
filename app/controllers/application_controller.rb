@@ -7,15 +7,16 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
 
   def current_user
-    nil
+    @current_user ||= authenticate_user!
   end
+  helper_method :current_user
 
   private
 
   def authenticate_user!
-    authenticate_or_request_with_http_basic("management", "Alakazam?") do |username, password|
+    @current_user = authenticate_or_request_with_http_basic("management", "Alakazam?") do |username, password|
       user = User.find_by(username: username)
-      user&.authenticate password
+      user if user&.authenticate password
     end
   end
 end

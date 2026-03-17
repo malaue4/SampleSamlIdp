@@ -18,8 +18,8 @@
   </head>
 
   <body class="d-grid vh-100 bg-body-secondary" style="grid-template-columns: 16rem 1fr; grid-template-rows: 100%">
-    <nav class="bg-body-tertiary border-end">
-      <ul class="nav nav-underline vstack px-3">
+    <nav class="bg-body-tertiary border-end d-flex flex-column">
+      <ul class="nav nav-underline vstack px-3 flex-grow-1">
         <% [:dashboard, User, UserSession, SamlMetadatum].each do |link| %>
           <li class="nav-item">
             <%= link_to link_label(link),
@@ -31,6 +31,24 @@
           </li>
         <% end %>
       </ul>
+
+      <% if current_user %>
+        <div class="mt-auto p-3 border-top">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+              <%= current_user.name&.first || current_user.username.first.upcase %>
+            </div>
+            <div class="overflow-hidden">
+              <div class="text-truncate fw-bold small"><%= current_user.name || current_user.username %></div>
+              <div class="text-truncate text-muted extra-small" style="font-size: 0.75rem;"><%= current_user.email %></div>
+            </div>
+          </div>
+          <%= link_to "My Account", account_path, class: [
+            "btn btn-sm w-100",
+            request.fullpath.starts_with?(account_path) ? "btn-primary" : "btn-outline-primary"
+          ] %>
+        </div>
+      <% end %>
     </nav>
     <main class="container-md container-fluid bg-body border-start border-end d-grid" style="grid-template-rows: auto 1fr auto;">
       <header class="row border-bottom bg-body-tertiary p-3">

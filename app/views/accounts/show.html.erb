@@ -1,0 +1,66 @@
+<% content_for :title, "Account Overview" %>
+<% content_for :header do %>
+  <div class="hstack gap-3">
+    <h1 class="h3 mb-0">My Account</h1>
+  </div>
+<% end %>
+
+<div class="col-12 p-4">
+  <% if notice.present? %>
+    <p class="alert alert-success" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="mb-4">
+    <h2 class="h5 mb-3">Profile Information</h2>
+    <%= render @user %>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+      <h2 class="h5 mb-0">Recent Activity</h2>
+      <span class="badge bg-secondary">Last 30 days</span>
+    </div>
+    <div class="card-body">
+      <%= line_chart @user.user_sessions.group_by_day(:created_at, range: 30.days.ago..Time.current).count, 
+                     xtitle: "Date", ytitle: "Sessions", height: "200px" %>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header bg-light">
+      <h2 class="h5 mb-0">Active Sessions</h2>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="ps-3">ID</th>
+            <th>Expires At</th>
+            <th>Created At</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% active_sessions = @user.user_sessions.active.order(created_at: :desc).limit(10) %>
+          <% active_sessions.each do |session| %>
+            <tr>
+              <td class="ps-3"><%= session.id %></td>
+              <td><%= session.expires_at.to_fs(:long) %></td>
+              <td><%= session.created_at.to_fs(:long) %></td>
+            </tr>
+          <% end %>
+        <% if active_sessions.none? %>
+         <tr>
+           <td colspan="3" class="text-center text-muted">No active sessions found</td>
+         </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<% content_for :footer do %>
+  <div class="d-flex gap-2 align-items-center">
+    <%= link_to "Edit Account Settings", edit_account_path, class: "btn btn-primary" %>
+  </div>
+<% end %>

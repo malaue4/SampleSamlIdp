@@ -35,7 +35,8 @@ class SamlMetadatum < ApplicationRecord
         sign_assertions: im.sign_assertions,
         sign_authn_request: im.sign_authn_request,
         logo: im.logo.squish,
-        fingerprint: SamlIdp::Fingerprint.certificate_digest("-----BEGIN CERTIFICATE-----\n#{im.signing_certificate}\n-----END CERTIFICATE-----\n"),
+        fingerprint:
+          im.signing_certificate.present? && SamlIdp::Fingerprint.certificate_digest("-----BEGIN CERTIFICATE-----\n#{im.signing_certificate}\n-----END CERTIFICATE-----\n"),
       }
     end
   end

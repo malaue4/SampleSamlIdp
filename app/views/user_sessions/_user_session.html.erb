@@ -1,12 +1,26 @@
-<div id="<%= dom_id user_session %>">
-  <p>
-    <strong>User:</strong>
-    <%= user_session.user_id %>
-  </p>
-
-  <p>
-    <strong>Expires at:</strong>
-    <%= user_session.expires_at %>
-  </p>
-
+<div id="<%= dom_id user_session %>" class="card">
+  <div class="card-body">
+    <table class="table table-borderless mb-0">
+      <tbody>
+        <tr>
+          <th class="ps-0 text-muted" style="width: 200px">User</th>
+          <td class="fw-medium">
+            <%= link_to user_session.user.name_id, user_session.user %>
+          </td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Expires at</th>
+          <td><%= user_session.expires_at.to_fs(:long) %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Created at</th>
+          <td><%= user_session.created_at.to_fs(:long) %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Updated at</th>
+          <td><%= user_session.updated_at.to_fs(:long) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

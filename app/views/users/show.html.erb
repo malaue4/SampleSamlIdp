@@ -1,10 +1,24 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :header do %>
+  <div class="hstack gap-3">
+    <h1 class="h3 mb-0">User Details</h1>
+    <%= link_to "Back to users", users_path, class: "btn btn-outline-secondary btn-sm ms-auto" %>
+  </div>
+<% end %>
 
-<%= render @user %>
+<div class="col-12 p-4">
+  <% if notice.present? %>
+    <p class="alert alert-success" id="notice"><%= notice %></p>
+  <% end %>
 
-<div>
-  <%= link_to "Edit this user", edit_user_path(@user) %> |
-  <%= link_to "Back to users", users_path %>
-
-  <%= button_to "Destroy this user", @user, method: :delete %>
+  <%= render @user %>
 </div>
+
+<% content_for :footer do %>
+  <div class="d-flex gap-2 align-items-center">
+    <%= link_to "Edit this user", edit_user_path(@user), class: "btn btn-primary" %>
+
+    <div class="ms-auto">
+      <%= button_to "Destroy this user", @user, method: :delete, class: "btn btn-outline-danger", data: { turbo_confirm: "Are you sure?" } %>
+    </div>
+  </div>
+<% end %>

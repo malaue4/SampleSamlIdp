@@ -8,7 +8,7 @@
   <%= form.text_field :username, floating: true %>
   <%= form.email_field :email, floating: true %>
   <%= form.telephone_field :phone, floating: true %>
-
+  <hr>
   <%= form.password_field :password, floating: true, autocomplete: "new-password" %>
   <%= form.password_field :password_confirmation, floating: true, autocomplete: "new-password" %>
   <% if user.persisted? %>

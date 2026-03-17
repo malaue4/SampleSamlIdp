@@ -1,22 +1,36 @@
-<div id="<%= dom_id user %>">
-  <p>
-    <strong>Name:</strong>
-    <%= user.name_id %>
-  </p>
-
-  <p>
-    <strong>Name:</strong>
-    <%= user.name %>
-  </p>
-
-  <p>
-    <strong>Email:</strong>
-    <%= user.email %>
-  </p>
-
-  <p>
-    <strong>Phone:</strong>
-    <%= user.phone %>
-  </p>
-
+<div id="<%= dom_id user %>" class="card">
+  <div class="card-body">
+    <table class="table table-borderless mb-0">
+      <tbody>
+        <tr>
+          <th class="ps-0 text-muted" style="width: 200px">Name ID</th>
+          <td class="fw-medium"><%= user.name_id %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Username</th>
+          <td><%= user.username %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Name</th>
+          <td><%= user.name %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Email</th>
+          <td><%= user.email %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Phone</th>
+          <td><%= user.phone %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Created at</th>
+          <td><%= user.created_at.to_fs(:long) %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">Updated at</th>
+          <td><%= user.updated_at.to_fs(:long) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

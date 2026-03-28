@@ -4,20 +4,30 @@ class Filter
   include ActiveModel::Model
   include ActiveModel::Attributes
 
-  attribute :created_after, :datetime
-  attribute :created_before, :datetime
+  class_attribute :range_attributes, default: []
 
-  # @param [ActiveRecord::Relation] relation
+  def self.range_attribute(name, type, after: "#{name}_after", before: "#{name}_before")
+    attribute after, type
+    attribute before, type
+    self.range_attributes += [[name, after, before]]
+  end
+
+  range_attribute :created_at, :datetime, after: :created_after, before: :created_before
+
   def apply!(relation)
-    attributes.except("created_after", "created_before").each do |name, value|
-      next if value.blank?
+    attributes.each do |name, value|
+      next if value.blank? || range_attribute?(name)
 
       relation.where!(name => value)
     end
-    attributes.values_at("created_after", "created_before").then do |created_after, created_before|
-      next if created_after.blank? && created_before.blank?
 
-      relation.where!(created_at: created_after..created_before)
+    range_attributes.each do |base_name, after_name, before_name|
+      after_val = public_send(after_name)
+      before_val = public_send(before_name)
+
+      next if after_val.blank? && before_val.blank?
+
+      relation.where!(base_name => after_val..before_val)
     end
   end
 
@@ -30,6 +40,12 @@ class Filter
   end
 
   private
+
+  def range_attribute?(name)
+    range_attributes.any? do |_base, after, before|
+      name.to_s == after.to_s || name.to_s == before.to_s
+    end
+  end
 
   def attribute_type(name)
     type = self.class.type_for_attribute(name).type || :string

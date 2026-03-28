@@ -6,9 +6,7 @@ class UserSessionsController < ApplicationController
   # GET /user_sessions
   def index
     @filter = Filter.new(params.fetch(:filter, {}).permit(*Filter.attribute_names))
-    if @filter.created_after || @filter.created_before
-      @user_sessions = @user_sessions.where(created_at: @filter.created_after..@filter.created_before)
-    end
+    @filter.apply!(@user_sessions)
     @pagy, @user_sessions = pagy(@user_sessions)
   end
 

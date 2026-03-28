@@ -35,9 +35,7 @@
       <% if current_user %>
         <div class="mt-auto p-3 border-top">
           <div class="d-flex align-items-center gap-2 mb-2">
-            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-              <%= current_user.name&.first || current_user.username.first.upcase %>
-            </div>
+            <%= user_avatar(current_user, size: 32) %>
             <div class="overflow-hidden">
               <div class="text-truncate fw-bold small"><%= current_user.name || current_user.username %></div>
               <div class="text-truncate text-muted extra-small" style="font-size: 0.75rem;"><%= current_user.email %></div>

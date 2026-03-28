@@ -3,7 +3,9 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    @pagy, @users = pagy(@users)
+    @filter = UsersFilter.new(params.fetch(:users_filter, {}).permit(*UsersFilter.attribute_names))
+    @filter.apply!(@users)
+    @pagy, @users = pagy(@users.order(id: :desc))
   end
 
   # GET /users/1 or /users/1.json
@@ -59,6 +61,7 @@ class UsersController < ApplicationController
     # Only allow a list of trusted parameters through.
     def user_params
       params.require(:user).permit(
+        :avatar,
         :name_id,
         :name,
         :username,

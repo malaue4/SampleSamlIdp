@@ -3,6 +3,12 @@
 <%= bootstrap_form_with(model: user) do |form| %>
   <%= form.alert_message t(".error", default: "Please fix the following errors:") %>
 
+  <% if user.avatar.attached? %>
+    <div class="mb-3">
+      <%= user_avatar(user, size: 100) %>
+    </div>
+  <% end %>
+  <%= form.file_field :avatar %>
   <%= form.text_field :name_id, floating: true %>
   <%= form.text_field :name, floating: true %>
   <%= form.text_field :username, floating: true %>

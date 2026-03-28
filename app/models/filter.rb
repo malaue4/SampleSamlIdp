@@ -7,6 +7,20 @@ class Filter
   attribute :created_after, :datetime
   attribute :created_before, :datetime
 
+  # @param [ActiveRecord::Relation] relation
+  def apply!(relation)
+    attributes.except("created_after", "created_before").each do |name, value|
+      next if value.blank?
+
+      relation.where!(name => value)
+    end
+    attributes.values_at("created_after", "created_before").then do |created_after, created_before|
+      next if created_after.blank? && created_before.blank?
+
+      relation.where!(created_at: created_after..created_before)
+    end
+  end
+
   def fields
     attribute_names.index_with do |name|
       {

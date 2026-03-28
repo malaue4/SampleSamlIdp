@@ -18,6 +18,8 @@
     "watch:css": "nodemon --watch ./app/assets/stylesheets/ --ext scss --exec \"yarn run build:css\""
   },
   "browserslist": [
-    "defaults"
+    "defaults",
+    "not dead",
+    "not kaios > 0"
   ]
 }

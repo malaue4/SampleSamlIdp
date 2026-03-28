@@ -10,7 +10,7 @@
           <%= bootstrap_form_for(@filter, url: "", method: :get, layout: :inline) do |f| %>
             <% @filter.fields.each do |name, options| %>
               <% options => type:, **field_options %>
-              <%= f.public_send type, name, **field_options.reverse_merge(floating: true) %>
+              <%= f.public_send type, name, **field_options.reverse_merge(floating: true, placeholder: "l") %>
             <% end %>
             <button type="reset" class="btn btn-danger"><i class="bi-x-lg"></i></button>
             <%= f.primary { tag.i(nil, class: "bi bi-search") } %>
@@ -31,7 +31,13 @@
           <%= link_to tag.i(record.id, class: "bi bi-search"), record %>
         </td>
         <% columns.each do |column| %>
-          <td><%= record[column] %></td>
+          <td>
+            <% if column == :avatar && record.is_a?(User) %>
+              <%= user_avatar(record, size: 24) %>
+            <% else %>
+              <%= record[column] %>
+            <% end %>
+          </td>
         <% end %>
       </tr>
     <% end %>

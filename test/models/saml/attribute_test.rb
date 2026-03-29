@@ -30,7 +30,7 @@ module Saml
                      "name_format"=>nil,
                      "friendly_name"=>nil,
                      "attribute_value"=>nil
-                   }}, attr.as_json)
+                   } }, attr.as_json)
     end
 
     test "single value with type" do
@@ -40,8 +40,8 @@ module Saml
                      "name"=>"isDefault",
                      "name_format"=>nil,
                      "friendly_name"=>nil,
-                     "attribute_value"=>true
-                   }}, attr.as_json)
+                     "attribute_value"=>{ "attributes" => { "type" => "xs:boolean", "value" => true } }
+                   } }, attr.as_json)
     end
 
     test "single value without type" do
@@ -51,7 +51,7 @@ module Saml
                        "name" => "isDefault",
                        "name_format" => nil,
                        "friendly_name" => nil,
-                       "attribute_value" => "true"
+                       "attribute_value" => { "attributes" => { "type" => nil, "value" => "true" } }
                      } }, attr.as_json)
     end
   end

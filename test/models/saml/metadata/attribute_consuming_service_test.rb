@@ -65,21 +65,20 @@ module Saml
             RequestedAttribute.new(
               name: "urn:oid:0.9.2342.19200300.100.1.3",
               friendly_name: "mail",
-              attribute_value: "test@localhost"
+              attribute_value: AttributeValue.new(value: "test@localhost")
             )
           ]
         )
-        assert_equal("test@localhost", acs.requested_attributes[0].attribute_value)
         doc = Nokogiri::XML::Builder.new do |builder|
           acs.build_xml(builder)
         end
 
         assert_equal(<<~XML, doc.to_xml)
           <?xml version="1.0"?>
-          <md:AttributeConsumingService xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" index="1" isDefault="false">
+          <md:AttributeConsumingService xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" index="1" isDefault="false">
             <md:ServiceName xml:lang="en">Razor Lanes</md:ServiceName>
             <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="mail" isRequired="false">
-              <saml:AttributeValue>test@localhost</saml:AttributeValue>
+              <saml:AttributeValue xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xsi:nil="false">test@localhost</saml:AttributeValue>
             </md:RequestedAttribute>
           </md:AttributeConsumingService>
         XML

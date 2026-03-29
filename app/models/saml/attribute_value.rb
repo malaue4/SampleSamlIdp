@@ -11,7 +11,7 @@ module Saml
 
     # @param [Nokogiri::XML::Node] attribute_element
     def self.parse(attribute_element)
-      type = attribute_element.attribute_with_ns("type", "xsi")&.value
+      type = attribute_element.attribute("xsi:type")&.value
       attributes = {
         type: type,
         value: parse_attribute_value(attribute_element, xsi_type: type),
@@ -21,9 +21,9 @@ module Saml
     end
 
     # @param [Nokogiri::XML::Node] attribute_value_element
-    def self.parse_attribute_value(attribute_value_element, xsi_type: "string")
+    def self.parse_attribute_value(attribute_value_element, xsi_type: nil)
       # Check for explicit nil
-      return nil if attribute_value_element.attribute_with_ns("nil", "xsi")&.value == "true"
+      return nil if attribute_value_element.attribute("xsi:nil")&.value == "true"
 
       # Parse based on type or fallback to text
       case xsi_type

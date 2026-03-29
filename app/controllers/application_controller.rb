@@ -16,7 +16,17 @@ class ApplicationController < ActionController::Base
   def authenticate_user!
     @current_user = authenticate_or_request_with_http_basic("management", "Alakazam?") do |username, password|
       user = User.find_by(username: username)
-      user if user&.authenticate password
+      result = if user.nil?
+        { failure: :invalid_username }
+      elsif user.authenticate password
+        :success
+      else
+        { failure: :invalid_password }
+      end
+
+      Rails.event.notify("user.authentication_attempt", username: username, result:)
+
+      result == :success ? user : nil
     end
   end
 end

@@ -5,6 +5,7 @@ module Saml
     include ActiveModel::Model
     include ActiveModel::Attributes
     include ToXml
+    include LazyAttributes
 
     RESPONSE_TYPES = %w[
       Response
@@ -17,16 +18,26 @@ module Saml
     attr_reader :raw_xml
 
     attribute :id, :string
+    lazy_attribute(:id) { status_response_element&.[]("ID") }
     attribute :in_response_to, :string
+    lazy_attribute(:in_response_to) { status_response_element&.[]("InResponseTo") }
     attribute :version, :string
+    lazy_attribute(:version) { status_response_element&.[]("Version") }
     attribute :issue_instant, :datetime
+    lazy_attribute(:issue_instant) { status_response_element&.[]("IssueInstant")&.to_datetime }
     attribute :destination, :string
+    lazy_attribute(:destination) { status_response_element&.[]("Destination") }
     attribute :consent, :string
+    lazy_attribute(:consent) { status_response_element&.[]("Consent") }
 
     attribute :issuer
+    lazy_attribute(:issuer) { issuer_element.present? ? NameId.parse(issuer_element) : nil }
     attribute :signature
+    # TODO: Load signature from XML
     attribute :extensions
+    # TODO: Load extensions from XML
     attribute :status
+    lazy_attribute(:status) { status_element.present? ? Status.parse(status_element) : nil }
 
 
     # @param [String] raw_xml
@@ -61,54 +72,16 @@ module Saml
       @raw_xml = raw_xml
     end
 
-    def id
-      @id ||= status_response_element&.[]("ID")
-    end
-
-    def in_response_to
-      @in_response_to ||= status_response_element&.[]("InResponseTo")
-    end
-
-    def version
-      @version ||= status_response_element&.[]("Version")
-    end
-
-    def issue_instant
-      @issue_instant ||= status_response_element&.[]("IssueInstant")
-    end
-
-    def destination
-      @destination ||= status_response_element&.[]("Destination")
-    end
-
-    def consent
-      @consent ||= status_response_element&.[]("Consent")
+    def document
+      @document ||= Nokogiri::XML(raw_xml)
     end
 
     def issuer_element
       @issuer_element ||= status_response_element&.at_xpath("saml:Issuer", "saml" => Namespaces::SAML)
     end
 
-    def issuer
-      return if issuer_element.blank?
-
-      @issuer ||= NameId.parse(issuer_element)
-    end
-
     def status_element
       @status_element ||= status_response_element&.at_xpath("samlp:Status", "samlp" => Namespaces::SAMLP)
-    end
-
-    def status
-      if status_element.blank?
-        return
-      end
-
-      @status ||= Status.parse(status_element)
-    end
-
-    def document
-      @document ||= Nokogiri::XML(raw_xml)
     end
 
     def status_response_element
@@ -133,7 +106,10 @@ module Saml
       end
 
       def xml_content(builder)
-        super
+        issuer&.build_xml(builder)
+        # signature&.build_xml(builder)
+        # extensions&.build_xml(builder)
+        status&.build_xml(builder)
       end
   end
 end

@@ -90,17 +90,10 @@ module Saml
       @subject_element ||= request_element.at_xpath("saml:Subject", "saml" => Namespaces::SAML)
     end
 
-    # TODO: Make it its own class?
     def parse_subject
       return unless subject_element
 
-      @subject ||= {
-        name_id: subject_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)
-          &.then { |name_id_element| NameId.parse(name_id_element) },
-        subject_confirmations: subject_element
-          .xpath("saml:SubjectConfirmation", "saml" => Namespaces::SAML)
-          .map { |subject_confirmation_element| SubjectConfirmation.parse(subject_confirmation_element) },
-      }
+      @subject ||= Subject.parse(subject_element)
     end
 
     def name_id_policy_element
@@ -119,40 +112,11 @@ module Saml
       }
     end
 
-    def conditions_element
-      @conditions_element ||= request_element.at_xpath("saml:Conditions", "saml" => Namespaces::SAML)
-    end
-
-    # Returns conditions extracted from the SAML request, including audience restrictions,
-    # one-time use indications, proxy restrictions, and time constraints. Conditions are
-    # parsed from the `<saml:Conditions>` element in the SAML request.
-    #
-    # - `audience_restrictions`: A list of audiences extracted from `<saml:AudienceRestriction>`.
-    # - `one_time_use`: A boolean indicating the presence of the `<saml:OneTimeUse>` element, used to
-    #   enforce that the assertion can only be used once.
-    # - `proxy_restriction`: Currently an empty array, intended for handling `<ProxyRestriction>` elements
-    #   in the future.
-    # - `not_before`: The `NotBefore` timestamp, extracted to indicate the earliest valid time for the assertion.
-    # - `not_on_or_after`: The `NotOnOrAfter` timestamp, extracted to indicate the latest valid time for the assertion.
-    #
-    # The method caches the parsed conditions for future use.
-    #
-    # TODO: Make it its own class?
-    #
-    # @return [Hash] A hash representing the parsed conditions.
     def parse_conditions
+      conditions_element = request_element.at_xpath("saml:Conditions", "saml" => Namespaces::SAML)
       return if conditions_element.nil?
 
-      @conditions ||= {
-        audience_restrictions: conditions_element
-          .xpath("saml:AudienceRestriction/saml:Audience", "saml" => Namespaces::SAML)
-          .map(&:text)
-          .presence,
-        one_time_use: conditions_element.at_xpath("saml:OneTimeUse", "saml" => Namespaces::SAML).present?,
-        proxy_restrictions: [].presence, # TODO: It looks like this: `<ProxyRestriction Count="2"><Audience>https://www.example.com/sp</Audience></ProxyRestriction>`
-        not_before: conditions_element&.attribute("NotBefore")&.value,
-        not_on_or_after: conditions_element&.attribute("NotOnOrAfter")&.value,
-      }.compact
+      Conditions.parse(conditions_element)
     end
 
     def requested_authn_context_element

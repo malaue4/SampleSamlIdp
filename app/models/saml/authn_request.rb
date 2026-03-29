@@ -5,6 +5,31 @@ module Saml
     POST_BINDING = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     REDIRECT_BINDING = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-REDIRECT"
 
+    attribute :force_authn, :boolean
+    lazy_attribute(:force_authn) { request_element.attribute("ForceAuthn")&.value == "true" }
+    attribute :passive, :boolean
+    lazy_attribute(:passive) { request_element.attribute("IsPassive")&.value == "true" }
+    attribute :protocol_binding, default: POST_BINDING
+    lazy_attribute(:protocol_binding) { request_element.attribute("ProtocolBinding")&.value }
+    attribute :assertion_consumer_service_index, :integer
+    lazy_attribute(:assertion_consumer_service_index) { request_element.attribute("AssertionConsumerServiceIndex")&.value&.to_i }
+    attribute :assertion_consumer_service_url, :string
+    lazy_attribute(:assertion_consumer_service_url) { request_element.attribute("AssertionConsumerServiceURL")&.value }
+    attribute :attribute_consuming_service_index, :integer
+    lazy_attribute(:attribute_consuming_service_index) { request_element.attribute("AttributeConsumingServiceIndex")&.value&.to_i }
+    attribute :provider_name, :string
+    lazy_attribute(:provider_name) { request_element.attribute("ProviderName")&.value }
+    attribute :subject
+    lazy_attribute(:subject) { parse_subject }
+    attribute :name_id_policy
+    lazy_attribute(:name_id_policy) { parse_name_id_policy }
+    attribute :conditions
+    lazy_attribute(:conditions) { parse_conditions }
+    attribute :requested_authn_context
+    lazy_attribute(:requested_authn_context) { parse_requested_authn_context }
+    attribute :scoping
+    lazy_attribute(:scoping) { parse_scoping }
+
     validates :assertion_consumer_service_url, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_nil: true }
     validates :passive?, absence: { if: :force_authn? }
     validates :force_authn?, absence: { if: :passive? }
@@ -41,67 +66,62 @@ module Saml
       end
     end
 
-      def force_authn?
-        @force_authn ||= request_element.attribute("ForceAuthn")&.value == "true"
-      end
+    def force_authn?
+      force_authn
+    end
 
-      def passive?
-        @passive ||= request_element.attribute("IsPassive")&.value == "true"
-      end
+    def passive?
+      passive
+    end
 
-      def protocol_binding
-        @protocol_binding ||= request_element.attribute("ProtocolBinding")&.value
-      end
+    def assertion_consumer_service_url
+      @assertion_consumer_service_url ||= request_element.attribute("AssertionConsumerServiceURL")&.value
+    end
 
-      def assertion_consumer_service_index
-        @assertion_consumer_service_index ||= request_element.attribute("AssertionConsumerServiceIndex")&.value&.to_i
-      end
+    def attribute_consuming_service_index
+      @attribute_consuming_service_index ||= request_element.attribute("AttributeConsumingServiceIndex")&.value&.to_i
+    end
 
-      def assertion_consumer_service_url
-        @assertion_consumer_service_url ||= request_element.attribute("AssertionConsumerServiceURL")&.value
-      end
+    def provider_name
+      @provider_name ||= request_element.attribute("ProviderName")&.value
+    end
 
-      def attribute_consuming_service_index
-        @attribute_consuming_service_index ||= request_element.attribute("AttributeConsumingServiceIndex")&.value&.to_i
-      end
+    def subject_element
+      @subject_element ||= request_element.at_xpath("saml:Subject", "saml" => Namespaces::SAML)
+    end
 
-      def provider_name
-        @provider_name ||= request_element.attribute("ProviderName")&.value
-      end
+    # TODO: Make it its own class?
+    def parse_subject
+      return unless subject_element
 
-      def subject_element
-        @subject_element ||= request_element.at_xpath("saml:Subject", "saml" => Namespaces::SAML)
-      end
+      @subject ||= {
+        name_id: subject_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)
+          &.then { |name_id_element| NameId.parse(name_id_element) },
+        subject_confirmations: subject_element
+          .xpath("saml:SubjectConfirmation", "saml" => Namespaces::SAML)
+          .map { |subject_confirmation_element| SubjectConfirmation.parse(subject_confirmation_element) },
+      }
+    end
 
-      def subject
-        return unless subject_element
+    def name_id_policy_element
+      @name_id_policy_element ||= request_element.at_xpath("samlp:NameIDPolicy", "samlp" => Namespaces::SAMLP)
+    end
 
-        @subject ||= {
-          name_id: subject_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)
-            &.then { |name_id_element| NameId.parse(name_id_element) },
-          subject_confirmations: subject_element
-            .xpath("saml:SubjectConfirmation", "saml" => Namespaces::SAML)
-            .map { |subject_confirmation_element| SubjectConfirmation.parse(subject_confirmation_element) },
-        }
-      end
 
-      def name_id_policy_element
-        @name_id_policy_element ||= request_element.at_xpath("samlp:NameIDPolicy", "samlp" => Namespaces::SAMLP)
-      end
+    # TODO: Make it its own class?
+    def parse_name_id_policy
+      return if name_id_policy_element.nil?
 
-      def name_id_policy
-        return if name_id_policy_element.nil?
+      @name_id_policy ||= {
+        format: name_id_policy_element&.attribute("Format")&.value,
+        sp_name_qualifier: name_id_policy_element&.attribute("SPNameQualifier")&.value,
+        allow_create: name_id_policy_element&.attribute("AllowCreate")&.value == "true"
+      }
+    end
 
-        @name_id_policy ||= {
-          format: name_id_policy_element&.attribute("Format")&.value,
-          sp_name_qualifier: name_id_policy_element&.attribute("SPNameQualifier")&.value,
-          allow_create: name_id_policy_element&.attribute("AllowCreate")&.value == "true"
-        }
-      end
-
-      def conditions_element
-        @conditions_element ||= request_element.at_xpath("saml:Conditions", "saml" => Namespaces::SAML)
-      end
+    def conditions_element
+      @conditions_element ||= request_element.at_xpath("saml:Conditions", "saml" => Namespaces::SAML)
+    end
 
     # Returns conditions extracted from the SAML request, including audience restrictions,
     # one-time use indications, proxy restrictions, and time constraints. Conditions are
@@ -117,41 +137,45 @@ module Saml
     #
     # The method caches the parsed conditions for future use.
     #
+    # TODO: Make it its own class?
+    #
     # @return [Hash] A hash representing the parsed conditions.
-      def conditions
-        return if conditions_element.nil?
+    def parse_conditions
+      return if conditions_element.nil?
 
-        @conditions ||= {
-          audience_restrictions: conditions_element
-            .xpath("saml:AudienceRestriction/saml:Audience", "saml" => Namespaces::SAML)
-            .map(&:text)
-            .presence,
-          one_time_use: conditions_element.at_xpath("saml:OneTimeUse", "saml" => Namespaces::SAML).present?,
-          proxy_restrictions: [].presence, # TODO: It looks like this: `<ProxyRestriction Count="2"><Audience>https://www.example.com/sp</Audience></ProxyRestriction>`
-          not_before: conditions_element&.attribute("NotBefore")&.value,
-          not_on_or_after: conditions_element&.attribute("NotOnOrAfter")&.value,
-        }.compact
-      end
+      @conditions ||= {
+        audience_restrictions: conditions_element
+          .xpath("saml:AudienceRestriction/saml:Audience", "saml" => Namespaces::SAML)
+          .map(&:text)
+          .presence,
+        one_time_use: conditions_element.at_xpath("saml:OneTimeUse", "saml" => Namespaces::SAML).present?,
+        proxy_restrictions: [].presence, # TODO: It looks like this: `<ProxyRestriction Count="2"><Audience>https://www.example.com/sp</Audience></ProxyRestriction>`
+        not_before: conditions_element&.attribute("NotBefore")&.value,
+        not_on_or_after: conditions_element&.attribute("NotOnOrAfter")&.value,
+      }.compact
+    end
 
-      def requested_authn_context_element
-        @requested_authn_context_element ||= request_element.at_xpath("samlp:RequestedAuthnContext", "samlp" => Namespaces::SAMLP)
-      end
+    def requested_authn_context_element
+      @requested_authn_context_element ||= request_element.at_xpath("samlp:RequestedAuthnContext", "samlp" => Namespaces::SAMLP)
+    end
 
-      def requested_authn_context
-        return if requested_authn_context_element.nil?
 
-        @requested_authn_context ||= {
-          class_refs: requested_authn_context_element
-            .xpath("saml:AuthnContextClassRef", "saml" => Namespaces::SAML).map(&:text).presence,
-          decl_refs: requested_authn_context_element
-            .xpath("saml:AuthnContextDeclRef", "saml" => Namespaces::SAML).map(&:text).presence,
-          comparison: requested_authn_context_element.attribute("Comparison")&.value
-        }.compact
-      end
+    # TODO: Make it its own class?
+    def parse_requested_authn_context
+      return if requested_authn_context_element.nil?
 
-      def scoping_element
-        @scoping_element ||= request_element.at_xpath("samlp:Scoping", "samlp" => Namespaces::SAMLP)
-      end
+      @requested_authn_context ||= {
+        class_refs: requested_authn_context_element
+          .xpath("saml:AuthnContextClassRef", "saml" => Namespaces::SAML).map(&:text).presence,
+        decl_refs: requested_authn_context_element
+          .xpath("saml:AuthnContextDeclRef", "saml" => Namespaces::SAML).map(&:text).presence,
+        comparison: requested_authn_context_element.attribute("Comparison")&.value
+      }.compact
+    end
+
+    def scoping_element
+      @scoping_element ||= request_element.at_xpath("samlp:Scoping", "samlp" => Namespaces::SAMLP)
+    end
 
     # Extracts and returns the scoping information from the SAML request, if available. Scoping information
     # is parsed from the `<samlp:Scoping>` element and may include details such as proxying restrictions
@@ -170,24 +194,26 @@ module Saml
     #
     # The method caches the parsed scoping information for future use.
     #
+    # TODO: Make it its own class?
+    #
     # @return [Hash] A hash representing the parsed scoping information.
-    def scoping
-        return if scoping_element.nil?
-
-        @scoping ||= {
-          proxy_count: scoping_element.attribute("ProxyCount")&.value&.to_i,
-          idp_list: {
-            entries: scoping_element.xpath("samlp:IDPList/samlp:IDPEntry", "samlp" => Namespaces::SAMLP).map do |entry|
-              {
-                provider_id: entry.attribute("ProviderID")&.value,
-                name: entry.attribute("Name")&.value,
-                location: entry.attribute("Loc")&.value,
-              }.compact
-            end,
-            get_complete: scoping_element.at_xpath("samlp:IDPList/samlp:GetComplete", "samlp" => Namespaces::SAMLP)&.value
-          }.compact
+    def parse_scoping
+      return Rails.logger.debug { "Scoping element is nil, skipping parsing" } if scoping_element.nil?
+      Rails.logger.debug { "The scoping element is" + scoping_element.inspect }
+      @scoping ||= {
+        proxy_count: scoping_element.attribute("ProxyCount")&.value&.to_i,
+        idp_list: {
+          entries: scoping_element.xpath("samlp:IDPList/samlp:IDPEntry", "samlp" => Namespaces::SAMLP).map do |entry|
+            {
+              provider_id: entry.attribute("ProviderID")&.value,
+              name: entry.attribute("Name")&.value,
+              location: entry.attribute("Loc")&.value,
+            }.compact
+          end,
+          get_complete: scoping_element.at_xpath("samlp:IDPList/samlp:GetComplete", "samlp" => Namespaces::SAMLP)&.value
         }.compact
-      end
+      }.compact
+    end
 
     private
 

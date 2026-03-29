@@ -21,6 +21,12 @@ module Saml
       end
     end
 
+    def to_xml
+      Nokogiri::XML::Builder.new(encoding: "UTF-8") do |builder|
+        build_xml(builder)
+      end.to_xml
+    end
+
     private
 
       def xml_namespace

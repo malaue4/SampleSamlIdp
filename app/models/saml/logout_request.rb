@@ -3,6 +3,15 @@
 module Saml
   class LogoutRequest < Request
 
+    attribute :name_id
+    lazy_attribute(:name_id) { parse_name_id }
+    attribute :session_indices
+    lazy_attribute(:session_indices) { parse_session_indices }
+    attribute :reason, :string
+    lazy_attribute(:reason) { request_element.attribute("Reason")&.value }
+    attribute :not_on_or_after, :datetime
+    lazy_attribute(:not_on_or_after) { request_element.attribute("NotOnOrAfter")&.value&.to_time }
+
     validates :name_id, presence: true
     validates :not_on_or_after, comparison: { greater_than: proc { Time.current }, allow_blank: true }
 
@@ -10,26 +19,18 @@ module Saml
       @name_id_element ||= request_element.at_xpath("saml:NameID", "saml" => Namespaces::SAML)
     end
 
-    def name_id
+    def parse_name_id
       return if name_id_element.blank?
 
-      @name_id ||= NameId.parse(name_id_element)
+      NameId.parse(name_id_element)
     end
 
     def session_index_elements
-      @session_index_element ||= request_element.xpath("samlp:SessionIndex", "samlp" => Namespaces::SAMLP)
+      request_element.xpath("samlp:SessionIndex", "samlp" => Namespaces::SAMLP)
     end
 
-    def session_indices
-      @session_index ||= session_index_elements.map(&:text)
-    end
-
-    def reason
-      @reason ||= request_element.attribute("Reason")&.value
-    end
-
-    def not_on_or_after
-      @not_on_or_after ||= request_element.attribute("NotOnOrAfter")&.value&.to_time
+    def parse_session_indices
+      session_index_elements.map(&:text).presence || []
     end
   end
 end

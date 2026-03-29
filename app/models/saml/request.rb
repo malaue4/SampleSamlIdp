@@ -5,6 +5,7 @@ module Saml
     include ActiveModel::Model
     include ActiveModel::Attributes
     include ToXml
+    include LazyAttributes
 
     attr_reader :raw_request
     # @!attribute [r] metadata
@@ -12,13 +13,21 @@ module Saml
     attr_accessor :metadata
 
     attribute :id, :string
+    lazy_attribute(:id) { request_element.attribute('ID').value }
     attribute :version, :string
+    lazy_attribute(:version) { request_element.attribute('Version').value }
     attribute :issue_instant, :string
+    lazy_attribute(:issue_instant) { request_element.attribute('IssueInstant').value }
     attribute :destination, :string
+    lazy_attribute(:destination) { request_element.attribute('Destination')&.value }
     attribute :consent, :string
-    attribute :issuer, :string
+    lazy_attribute(:consent) { request_element["Consent"] }
+    attribute :issuer
+    lazy_attribute(:issuer) { issuer_element.present? ? NameId.parse(issuer_element) : nil }
     attribute :signature, :string
+    lazy_attribute(:signature) { signature_element.present? ? signature_element.to_xml : nil }
     attribute :extensions, :string
+    lazy_attribute(:extensions) { extensions_element.present? ? extensions_element.to_xml : nil }
 
     validates :raw_request, presence: true
     validates :metadata, presence: { message: "is needed for most validations and for verifying signature" }
@@ -73,31 +82,31 @@ module Saml
     # The ID of the request. It is used when responding to the request. It must be unique and only used once.
     #
     # @return [String]
-    def id
-      @id ||= request_element.attribute('ID').value
-    end
+    # def id
+    #   super
+    # end
 
     # The version of the request. It indicates the SAML protocol version used in the request.
     #
     # @return [String]
-    def version
-      @version ||= request_element.attribute('Version').value
-    end
+    # def version
+    #   super
+    # end
 
     # The IssueInstant of the request. It represents the timestamp when the request was issued.
     #
     # @return [String]
-    def issue_instant
-      @issue_instant ||= request_element.attribute('IssueInstant').value
-    end
+    # def issue_instant
+    #   super
+    # end
 
     # The destination of the request. It specifies the endpoint to which the request must be sent.
     # If it does not match the endpoint of the identity provider, the request must be rejected.
     #
     # @return [String, nil]
-    def destination
-      @destination ||= request_element.attribute('Destination')&.value
-    end
+    # def destination
+    #   super
+    # end
 
     # The Consent of the request. It specifies the user's consent to the request process, if provided.
     # Possible values are:
@@ -117,19 +126,17 @@ module Saml
     #   * Specifies that the issuer of the message does not need to get or report the user consent.
     #
     # @return [String, nil]
-    def consent
-      @consent ||= request_element["Consent"]
-    end
+    # def consent
+    #   super
+    # end
 
     def issuer_element
       @issuer_element ||= request_element.at_xpath("saml:Issuer", "saml" => Namespaces::SAML)
     end
 
-    def issuer
-      return if issuer_element.blank?
-
-      @issuer ||= NameId.parse(issuer_element)
-    end
+    # def issuer
+    #   super
+    # end
 
     # The entity ID of the issuer. It identifies the entity that issued the SAML request.
     # This is used to determine which set of metadata to use when validating the request.

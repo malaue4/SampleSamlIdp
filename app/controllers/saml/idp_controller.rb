@@ -141,7 +141,6 @@ module Saml
         signed_xml = if true # sign_response?
           sd = Xmldsig::SignedDocument.new(unsigned_xml)
           signing_key = SamlIdp.config.secret_key
-          puts signing_key
           sd.sign(OpenSSL::PKey.read signing_key, "curse you perry the platypus")
         else
           unsigned_xml
@@ -192,7 +191,7 @@ module Saml
 
       def require_saml_request
         @saml_request = Request.parse(params.require(:SAMLRequest))
-      rescue Request::SchemaError => e
+      rescue Errors::SchemaError => e
         @saml_idp_fail_msg = e.message
       end
   end

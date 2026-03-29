@@ -11,8 +11,8 @@ module Saml
         <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified" AllowCreate="true"/>
       </samlp:AuthnRequest>
     XML
-    DEFLATED_AUTHN_REQUEST_XML = Request::Encoding.encode(Request::Compression.deflate(AUTHN_REQUEST_XML))
-    UNDEFLATED_AUTHN_REQUEST_XML = Request::Encoding.encode(AUTHN_REQUEST_XML)
+    DEFLATED_AUTHN_REQUEST_XML = Encoding.encode(Compression.deflate(AUTHN_REQUEST_XML))
+    UNDEFLATED_AUTHN_REQUEST_XML = Encoding.encode(AUTHN_REQUEST_XML)
 
     UNSIGNED_XML_REQUEST_XML = <<~XML
       <samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="pfx41d8ef22-e612-8c50-9960-1b16f15741b3" Version="2.0" ProviderName="SP test" IssueInstant="2014-07-16T23:52:45Z" Destination="http://idp.example.com/SSOService.php" ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" AssertionConsumerServiceURL="http://sp.example.com/demo1/index.php?acs">
@@ -71,12 +71,12 @@ module Saml
       skip "Not implemented"
       strings_that_arent_deflated = %w[test these strings boi before i fall_apart slowlygentlythisishowalifeistaken]
       strings_that_arent_deflated.each do |word|
-        assert !Request::Compression.needs_inflation?(word), "expected not to need inflation for #{word}"
+        assert !Compression.needs_inflation?(word), "expected not to need inflation for #{word}"
       end
 
-      strings_that_are_deflated = strings_that_arent_deflated.map { |word| Request::Compression.deflate(word) }
+      strings_that_are_deflated = strings_that_arent_deflated.map { |word| Compression.deflate(word) }
       strings_that_are_deflated.each do |word|
-        assert Request::Compression.needs_inflation?(word), "expected to need inflation for #{word}"
+        assert Compression.needs_inflation?(word), "expected to need inflation for #{word}"
       end
     end
 
@@ -84,12 +84,12 @@ module Saml
       Faker::HTML.random
       strings_that_arent_encoded = 10.times.map { Faker::HTML.random }
       strings_that_arent_encoded.each do |word|
-        assert !Request::Encoding.needs_decoding?(word), "Expected #{word} to not need decoding"
+        assert !Encoding.needs_decoding?(word), "Expected #{word} to not need decoding"
       end
 
       strings_that_are_encoded = strings_that_arent_encoded.map { |word| Base64.encode64(word) }
       strings_that_are_encoded.each do |word|
-        assert Request::Encoding.needs_decoding?(word), "Expected #{word} to need decoding"
+        assert Encoding.needs_decoding?(word), "Expected #{word} to need decoding"
       end
     end
 
@@ -99,7 +99,7 @@ module Saml
         "these" => "+\xC9H-N\x05\x00".dup.force_encoding("ASCII-8BIT"),
         "strings" => "+.)\xCA\xCCK/\x06\x00".dup.force_encoding("ASCII-8BIT"),
       }.each do |inflated_word, deflated_word|
-        assert_equal deflated_word, Request::Compression.deflate(inflated_word)
+        assert_equal deflated_word, Compression.deflate(inflated_word)
       end
     end
 
@@ -109,14 +109,14 @@ module Saml
         "these" => "+\xC9H-N\x05\x00".dup.force_encoding("ASCII-8BIT"),
         "strings" => "+.)\xCA\xCCK/\x06\x00".dup.force_encoding("ASCII-8BIT"),
       }.each do |inflated_word, deflated_word|
-        assert_equal inflated_word, Request::Compression.inflate(deflated_word)
+        assert_equal inflated_word, Compression.inflate(deflated_word)
       end
     end
 
     def test_decode
       %w[test these strings boi before i fall_apart slowlygentlythisishowalifeistaken].each do |word|
         encoded = Base64.encode64(word)
-        decoded = Request::Encoding.decode(encoded)
+        decoded = Encoding.decode(encoded)
         assert_equal word, decoded
       end
     end

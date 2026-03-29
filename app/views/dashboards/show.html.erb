@@ -49,7 +49,7 @@
   </div>
 </div>
 
-<pre><code lang="xml"><%=
+<pre><code lang="xml"><%
   sample_authn_request = <<~XML
     <samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="pfx41d8ef22-e612-8c50-9960-1b16f15741b3" Version="2.0" ProviderName="SP test" IssueInstant="2014-07-16T23:52:45Z" Destination="http://idp.example.com/SSOService.php" ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" AssertionConsumerServiceURL="http://sp.example.com/demo1/index.php?acs">
       <saml:Issuer>http://sp.example.com/demo1/metadata.php</saml:Issuer>
@@ -81,7 +81,7 @@
   XML
 %></code></pre>
 
-<pre><code><%=
+<%
   full_sample_authn_request = <<~XML
     <?xml version="1.0" encoding="UTF-8"?>
     <samlp:AuthnRequest
@@ -114,10 +114,10 @@
       </samlp:Scoping>
     </samlp:AuthnRequest>
   XML
-%></code></pre>
+%>
 
-<%= tag.pre(
+<%= debug(
       Saml::Request.parse(full_sample_authn_request).then do |req|
-        %i[id version issue_instant destination consent issuer_entity_id force_authn? passive? protocol_binding assertion_consumer_service_index assertion_consumer_service_url attribute_consuming_service_index provider_name subject name_id_policy conditions requested_authn_context scoping].index_with { |meth| req.send(meth) }
+        req.as_json
       end.compact.to_yaml)
 %>

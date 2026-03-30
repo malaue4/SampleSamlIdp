@@ -3,7 +3,7 @@
 module Saml
   class AuthnRequest < Request
     POST_BINDING = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-    REDIRECT_BINDING = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-REDIRECT"
+    REDIRECT_BINDING = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
 
     attribute :force_authn, :boolean
     lazy_attribute(:force_authn) { request_element.attribute("ForceAuthn")&.value == "true" }

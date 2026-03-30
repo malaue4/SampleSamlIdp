@@ -33,6 +33,7 @@ module Saml
   # authorization (proving they're presenting their own assertion).
   class SubjectConfirmation
     include ActiveModel::Model
+    include ToXml
 
     attr_accessor :name_id, :subject_confirmation_data, :method
 
@@ -52,6 +53,7 @@ module Saml
 
     class Data
       include ActiveModel::Model
+      include ToXml
 
       attr_accessor :not_before, :not_on_or_after, :recipient, :in_response_to, :address, :data
 
@@ -69,6 +71,41 @@ module Saml
           }
         )
       end
+
+      private
+
+      def xml_namespace
+        { href: Namespaces::SAML, prefix: "saml" }
+      end
+
+      def xml_element_name
+        :SubjectConfirmationData
+      end
+
+      def xml_attributes
+        {
+          NotBefore: not_before&.iso8601,
+          NotOnOrAfter: not_on_or_after&.iso8601,
+          Recipient: recipient,
+          InResponseTo: in_response_to,
+          Address: address,
+        }.compact
+      end
+    end
+
+    private
+
+    def xml_namespace
+      { href: Namespaces::SAML, prefix: "saml" }
+    end
+
+    def xml_attributes
+      { Method: method }.compact
+    end
+
+    def xml_content(builder)
+      name_id&.build_xml(builder)
+      subject_confirmation_data&.build_xml(builder)
     end
   end
 end

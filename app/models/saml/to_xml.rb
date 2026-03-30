@@ -4,7 +4,8 @@ module Saml
   module ToXml
     # @param [Nokogiri::XML::Builder] builder
     # @param [Hash] extra_attributes
-    def build_xml(builder, **extra_attributes)
+    def build_xml(builder, xml_element_name: nil, **extra_attributes)
+      xml_element_name ||= self.xml_element_name
       if xml_namespace.present?
         namespace_href = xml_namespace[:href]
         namespace_prefix = xml_namespace[:prefix]

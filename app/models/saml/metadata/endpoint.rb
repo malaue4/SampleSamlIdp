@@ -4,6 +4,7 @@ module Saml
   module Metadata
     class Endpoint
       include ActiveModel::Model
+      include ToXml
 
       attr_accessor(
         :binding,
@@ -22,6 +23,16 @@ module Saml
         yield attributes if block_given?
         new(attributes)
       end
+
+      private
+
+        def xml_namespace
+          { href: Namespaces::MD, prefix: "md" }
+        end
+
+        def xml_attributes
+          { Binding: binding, Location: location, ResponseLocation: response_location }
+        end
     end
   end
 end

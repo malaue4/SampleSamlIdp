@@ -61,7 +61,30 @@ XML
       test "with metadata" do
         entity = EntityDescriptor.new(raw_xml: METADATA_XML)
 
-        puts entity.role_descriptor_elements.as_json.map(&:deep_stringify_keys).to_yaml
+        # puts entity.role_descriptor_elements.as_json.map(&:deep_stringify_keys).to_yaml
+        assert_equal "https://idp-saml.ua3.int/simplesaml/saml2/idp/metadata.php", entity.entity_id
+      end
+
+      test ".parse with metadata" do
+        entity = EntityDescriptor.parse(METADATA_XML)
+        assert_instance_of EntityDescriptor, entity
+        assert_equal "https://idp-saml.ua3.int/simplesaml/saml2/idp/metadata.php", entity.entity_id
+      end
+
+      test "direct construction" do
+        idp_descriptor = IdentityProviderSingleSignOnDescriptor.new(
+          protocol_support_enumeration: "urn:oasis:names:tc:SAML:2.0:protocol",
+          want_authn_requests_signed: true
+        )
+        entity = EntityDescriptor.new(
+          entity_id: "http://example.org/idp",
+          role_descriptor_elements: [idp_descriptor]
+        )
+        assert_equal "http://example.org/idp", entity.entity_id
+        xml = entity.to_xml
+        assert_match /entityID="http:\/\/example.org\/idp"/, xml
+        assert_match /IDPSSODescriptor/, xml
+        assert_match /WantAuthnRequestsSigned="true"/, xml
       end
     end
   end

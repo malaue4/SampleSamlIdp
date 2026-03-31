@@ -20,7 +20,81 @@ module Saml
     end
 
     def show
-      render xml: SamlIdp.metadata.signed
+      render xml: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n#{'<?xml-stylesheet type="text/xsl" href="/saml-metadata.xsl"?>'}\n#{SamlIdp.metadata.signed}"
+    end
+
+    def metadata
+      organization_name = Faker::Company.name
+
+      metadata = Metadata::EntityDescriptor.new(
+        entity_id: "SamlIdp.config.entity_id",
+        id: "_#{SecureRandom.uuid}",
+        valid_until: 1.hour.from_now,
+        cache_duration: 1.hour.iso8601,
+        organization: Metadata::Organization.new(
+          name: { en: organization_name },
+          display_name: { en: organization_name },
+          url: { en: root_url },
+        ),
+        contact_people: [
+          Metadata::ContactPerson.new(
+            contact_type: "technical",
+            company: organization_name,
+            given_name: name = Faker::Name.first_name,
+            sur_name: lname = Faker::Name.last_name,
+            email_addresses: [Faker::Internet.email(name: "#{name} #{lname}")],
+            telephone_numbers: [Faker::PhoneNumber.cell_phone_in_e164],
+          ),
+          Metadata::ContactPerson.new(
+            contact_type: "support",
+            company: organization_name,
+            given_name: name = Faker::Name.first_name,
+            sur_name: lname = Faker::Name.last_name,
+            email_addresses: [Faker::Internet.email(name: "#{name} #{lname}")],
+            telephone_numbers: [Faker::PhoneNumber.cell_phone_in_e164],
+          ),
+          Metadata::ContactPerson.new(
+            contact_type: "billing",
+            company: organization_name,
+            given_name: name = Faker::Name.first_name,
+            sur_name: lname = Faker::Name.last_name,
+            email_addresses: [Faker::Internet.email(name: "#{name} #{lname}")],
+            telephone_numbers: [Faker::PhoneNumber.cell_phone_in_e164],
+          ),
+        ],
+        role_descriptor_elements: [
+          Metadata::ServiceProviderSingleSignOnDescriptor.new(
+            protocol_support_enumeration: "urn:oasis:names:tc:SAML:2.0:protocol",
+            authn_requests_signed: true,
+            want_assertions_signed: true,
+            assertion_consumer_services: [],
+            attribute_consuming_services: [],
+          ),
+          Metadata::IdentityProviderSingleSignOnDescriptor.new(
+            want_authn_requests_signed: true,
+            single_sign_on_services: [
+              Metadata::SingleSignOnService.new(
+                binding: AuthnRequest::REDIRECT_BINDING,
+                location: saml_auth_url,
+                response_location: saml_auth_url,
+              ),
+              Metadata::SingleSignOnService.new(
+                binding: Saml::AuthnRequest::POST_BINDING,
+                location: saml_auth_url,
+                response_location: saml_auth_url,
+              ),
+            ]
+          )
+        ]
+      )
+
+      doc = Nokogiri::XML::Builder.new(encoding: "UTF-8") do |builder|
+        metadata.build_xml(builder)
+      end.doc
+      pi = Nokogiri::XML::ProcessingInstruction.new(doc, "xml-stylesheet", 'type="text/xsl" href="/saml-metadata.xsl"')
+      doc.root.add_previous_sibling(pi)
+
+      render xml: doc.to_xml
     end
 
     def create

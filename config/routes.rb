@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
   namespace :saml do
     get "metadata" => "idp#show"
+    get "metadata2" => "idp#metadata"
     get "auth" => "idp#new"
     post "auth" => "idp#create"
     match "logout" => "idp#logout", via: [ :get, :post, :delete ]

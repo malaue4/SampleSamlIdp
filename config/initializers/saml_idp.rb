@@ -59,8 +59,8 @@ CERT
 
   config.password = "curse you perry the platypus"
   config.algorithm = :sha256                                    # Default: sha1 only for development.
-  config.organization_name = "Your Organization"
-  config.organization_url = "http://example.com"
+  config.organization_name = "Doofenschmirtz Evil Inc."
+  config.organization_url = "http://doofenschmirtz.localhost/"
   config.base_saml_location = "#{base}/saml"
   # config.reference_id_generator                                 # Default: -> { SecureRandom.uuid }
   config.single_logout_service_post_location = "#{base}/saml/logout"
@@ -136,11 +136,11 @@ CERT
   }
   ## EXAMPLE ##
 
-  config.technical_contact.company = "Example"
-  config.technical_contact.given_name = "Jonny Quest"
-  config.technical_contact.sur_name = "Support"
+  config.technical_contact.company = "Doofenschmirtz Evil Inc."
+  config.technical_contact.given_name = "Jonny"
+  config.technical_contact.sur_name = "Quest"
   config.technical_contact.telephone = "55555555555"
-  config.technical_contact.email_address = "example@example.com"
+  config.technical_contact.email_address = "jonny.quest@doofenschmirtz.localhost"
 
   service_providers = {
     "urn:example:sp" => {

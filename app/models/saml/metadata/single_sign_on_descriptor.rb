@@ -3,48 +3,51 @@
 module Saml
   module Metadata
     class SingleSignOnDescriptor < RoleDescriptor
+      attribute :name_id_formats
+      lazy_attribute(:name_id_formats) do
+        role_descriptor_element&.xpath("md:NameIDFormat", "md" => Namespaces::MD)&.map(&:text) || []
+      end
 
+      attr_accessor :artifact_resolution_services, :single_logout_services, :manage_name_id_services
 
       def artifact_resolution_services
         @artifact_resolution_services ||= role_descriptor_element
-          .xpath("md:ArtifactResolutionService", "md" => Namespaces::MD)
-          .map do |service|
+          &.xpath("md:ArtifactResolutionService", "md" => Namespaces::MD)
+          &.map do |service|
           ArtifactResolutionService.parse(service)
-        end
+        end || []
       end
 
       def single_logout_services
         @single_logout_services ||= role_descriptor_element
-          .xpath("md:SingleLogoutService", "md" => Namespaces::MD)
-          .map do |service|
+          &.xpath("md:SingleLogoutService", "md" => Namespaces::MD)
+          &.map do |service|
           SingleLogoutService.parse(service)
-        end
+        end || []
       end
 
       def manage_name_id_services
         @manage_name_id_services ||= role_descriptor_element
-          .xpath("md:ManageNameIDService", "md" => Namespaces::MD)
-          .map do |service|
+          &.xpath("md:ManageNameIDService", "md" => Namespaces::MD)
+          &.map do |service|
           ManageNameIdService.parse(service)
-        end
+        end || []
       end
 
       def name_id_formats
         @name_id_formats ||= role_descriptor_element
-          .xpath("md:NameIDFormat", "md" => Namespaces::MD)
-          .map do |service|
-          service.text
-        end
+          &.xpath("md:NameIDFormat", "md" => Namespaces::MD)
+          &.map(&:text) || []
       end
 
-      def as_json
-        super.merge!(
-          artifact_resolution_services:,
-          single_logout_services:,
-          manage_name_id_services:,
-          name_id_formats:,
-        )
-      end
+      private
+
+        def xml_content(builder)
+          super
+          name_id_formats&.each do |format|
+            builder[:md].NameIDFormat format
+          end
+        end
     end
   end
 end

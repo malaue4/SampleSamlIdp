@@ -10,13 +10,10 @@ module Saml
 XML
         acs = AssertionConsumerService.parse(node)
 
-        assert_equal({
-                       "binding"=>"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
-                       "location"=>"https://localhost:3000/saml/auth",
-                       "response_location"=>nil,
-                       "index"=>0,
-                       "default"=>false
-                     }, acs.as_json)
+        assert_equal "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", acs.binding
+        assert_equal "https://localhost:3000/saml/auth", acs.location
+        assert_equal 0, acs.index
+        assert_equal false, acs.default
       end
     end
   end

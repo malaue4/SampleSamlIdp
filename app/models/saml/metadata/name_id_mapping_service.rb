@@ -1,6 +1,6 @@
 module Saml
   module Metadata
-    class NameIdMappingService < Endpoint
+    class NameIdMappingService < EndpointWithoutResponseLocation
 
     end
   end

@@ -2,7 +2,8 @@
 
 module Saml
   module Metadata
-    class ArtifactResolutionService < IndexedEndpoint
+    class ArtifactResolutionService < EndpointWithoutResponseLocation
+      include IndexedEndpoint
     end
 
   end

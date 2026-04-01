@@ -2,7 +2,8 @@
 
 module Saml
   module Metadata
-    class AssertionConsumerService < IndexedEndpoint
+    class AssertionConsumerService < EndpointWithResponseLocation
+      include IndexedEndpoint
     end
   end
 end

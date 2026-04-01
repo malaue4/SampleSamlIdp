@@ -1,6 +1,6 @@
 module Saml
   module Metadata
-    class SingleLogoutService < Endpoint
+    class SingleLogoutService < EndpointWithResponseLocation
 
     end
   end

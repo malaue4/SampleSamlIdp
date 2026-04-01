@@ -2,7 +2,7 @@
 
 module Saml
   module Metadata
-    class AssertionIdRequestService < Endpoint
+    class AssertionIdRequestService < EndpointWithoutResponseLocation
 
     end
 

@@ -1,6 +1,6 @@
 module Saml
   module Metadata
-    class ManageNameIdService < Endpoint
+    class ManageNameIdService < EndpointWithResponseLocation
 
     end
   end

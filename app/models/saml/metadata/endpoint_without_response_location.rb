@@ -2,7 +2,7 @@
 
 module Saml
   module Metadata
-    class Endpoint
+    class EndpointWithoutResponseLocation
       include ActiveModel::Model
       include ActiveModel::Attributes
       include ToXml
@@ -12,8 +12,6 @@ module Saml
       lazy_attribute(:binding) { endpoint_element&.attribute("Binding")&.value }
       attribute :location, :string
       lazy_attribute(:location) { endpoint_element&.attribute("Location")&.value }
-      attribute :response_location, :string
-      lazy_attribute(:response_location) { endpoint_element&.attribute("ResponseLocation")&.value }
 
       # @param [Nokogiri::XML::Node] endpoint_element
       def self.parse(endpoint_element)
@@ -40,7 +38,6 @@ module Saml
           {
             Binding: binding,
             Location: location,
-            ResponseLocation: response_location,
           }.compact
         end
     end

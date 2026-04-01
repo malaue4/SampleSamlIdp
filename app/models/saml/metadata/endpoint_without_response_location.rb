@@ -2,14 +2,19 @@
 
 module Saml
   module Metadata
+    # Base class for SAML metadata endpoints that do not include a ResponseLocation attribute.
     class EndpointWithoutResponseLocation
       include ActiveModel::Model
       include ActiveModel::Attributes
       include ToXml
       include LazyAttributes
 
+      # @!attribute [rw] binding
+      #   @return [String] the URI reference identifying the SAML binding used by the endpoint
       attribute :binding, :string
       lazy_attribute(:binding) { endpoint_element&.attribute("Binding")&.value }
+      # @!attribute [rw] location
+      #   @return [String] the URI reference identifying the location of the endpoint
       attribute :location, :string
       lazy_attribute(:location) { endpoint_element&.attribute("Location")&.value }
 

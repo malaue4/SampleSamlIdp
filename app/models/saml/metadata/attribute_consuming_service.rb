@@ -2,16 +2,28 @@
 
 module Saml
   module Metadata
+    # The AttributeConsumingService element describes the set of SAML attributes
+    # requested by a Service Provider (SP) for a particular service. It allows an IdP
+    # to understand what user data the SP requires for its operation.
     class AttributeConsumingService
       include ActiveModel::Model
       include ActiveModel::Attributes
       include ToXml
 
-
+      # @!attribute [rw] service_name
+      #   @return [Hash<String, String>] the service names for various languages
       attribute :service_name
+      # @!attribute [rw] service_description
+      #   @return [Hash<String, String>] the service descriptions for various languages
       attribute :service_description
+      # @!attribute [rw] requested_attributes
+      #   @return [Array<Saml::Metadata::RequestedAttribute>] the requested attributes
       attribute :requested_attributes
+      # @!attribute [rw] index
+      #   @return [Integer] the unique index for the service
       attribute :index, :integer, default: 1
+      # @!attribute [rw] default
+      #   @return [Boolean] whether the service is the default one
       attribute :default, :boolean, default: false
 
 

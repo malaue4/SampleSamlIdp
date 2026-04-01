@@ -2,7 +2,10 @@
 
 module Saml
   module Metadata
+    # Base class for SAML metadata endpoints that include a ResponseLocation attribute.
     class EndpointWithResponseLocation < EndpointWithoutResponseLocation
+      # @!attribute [rw] response_location
+      #   @return [String] the URI reference identifying the location for SAML response messages
       attribute :response_location, :string
       lazy_attribute(:response_location) { endpoint_element&.attribute("ResponseLocation")&.value }
 

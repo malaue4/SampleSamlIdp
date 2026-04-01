@@ -2,8 +2,12 @@
 
 module Saml
   module Metadata
+    # The RequestedAttribute element is used within an AttributeConsumingService
+    # to define a specific SAML attribute that the Service Provider (SP) requests from an IdP.
     class RequestedAttribute < Attribute
 
+      # @!attribute [rw] required
+      #   @return [Boolean] whether the attribute is required by the service
       attribute :required, :boolean, default: false
 
       def self.parse(name_id_element)

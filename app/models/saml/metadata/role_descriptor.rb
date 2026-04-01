@@ -45,6 +45,10 @@ module Saml
           ).compact
         end
 
+        def xml_namespace
+          { href: Namespaces::MD, prefix: "md" }
+        end
+
         def xml_element_name
           case self
           when IdentityProviderSingleSignOnDescriptor then :IDPSSODescriptor

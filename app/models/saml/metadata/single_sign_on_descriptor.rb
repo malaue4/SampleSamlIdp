@@ -34,16 +34,13 @@ module Saml
         end || []
       end
 
-      def name_id_formats
-        @name_id_formats ||= role_descriptor_element
-          &.xpath("md:NameIDFormat", "md" => Namespaces::MD)
-          &.map(&:text) || []
-      end
-
       private
 
         def xml_content(builder)
           super
+          artifact_resolution_services&.each { |s| s.build_xml(builder) }
+          single_logout_services&.each { |s| s.build_xml(builder) }
+          manage_name_id_services&.each { |s| s.build_xml(builder) }
           name_id_formats&.each do |format|
             builder[:md].NameIDFormat format
           end

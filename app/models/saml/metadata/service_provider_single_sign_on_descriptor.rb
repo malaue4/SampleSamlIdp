@@ -39,6 +39,7 @@ module Saml
         def xml_content(builder)
           super
           assertion_consumer_services&.each { |s| s.build_xml(builder) }
+          attribute_consuming_services&.each { |s| s.build_xml(builder) }
         end
     end
   end

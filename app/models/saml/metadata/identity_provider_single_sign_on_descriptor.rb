@@ -6,7 +6,7 @@ module Saml
       attribute :want_authn_requests_signed, :boolean
       lazy_attribute(:want_authn_requests_signed) { role_descriptor_element&.attribute("WantAuthnRequestsSigned")&.value == "true" }
 
-      attr_accessor :single_sign_on_services, :name_id_mapping_services, :assertion_id_request_services, :attribute_profiles, :attributes
+      attr_accessor :single_sign_on_services, :name_id_mapping_services, :assertion_id_request_services, :attribute_profiles, :saml_attributes
 
       def single_sign_on_services
         @single_sign_on_services ||= role_descriptor_element
@@ -40,8 +40,8 @@ module Saml
         end || []
       end
 
-      def attributes
-        @attributes ||= role_descriptor_element
+      def saml_attributes
+        @saml_attributes ||= role_descriptor_element
           &.xpath("saml:Attribute", "saml" => Namespaces::SAML)
           &.map do |attribute|
           Attribute.parse(attribute)
@@ -59,6 +59,10 @@ module Saml
         def xml_content(builder)
           super
           single_sign_on_services&.each { |s| s.build_xml(builder) }
+          name_id_mapping_services&.each { |s| s.build_xml(builder) }
+          assertion_id_request_services&.each { |s| s.build_xml(builder) }
+          attribute_profiles&.each { |p| builder[:md].AttributeProfile p }
+          saml_attributes&.each { |a| a.build_xml(builder) }
         end
     end
   end

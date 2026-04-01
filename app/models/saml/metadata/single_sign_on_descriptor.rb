@@ -3,6 +3,9 @@
 module Saml
   module Metadata
     class SingleSignOnDescriptor < RoleDescriptor
+
+      # @!attribute [rw] name_id_formats
+      #   @return [Array<String>] list of supported NameID formats
       attribute :name_id_formats
       lazy_attribute(:name_id_formats) do
         role_descriptor_element&.xpath("md:NameIDFormat", "md" => Namespaces::MD)&.map(&:text) || []

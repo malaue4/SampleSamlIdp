@@ -6,9 +6,9 @@ module Saml
     include ActiveModel::Attributes
     include ToXml
 
-    attribute(:name)
-    attribute(:name_format, default: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri")
-    attribute(:friendly_name)
+    attribute(:name, :string)
+    attribute(:name_format, :string, default: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri")
+    attribute(:friendly_name, :string)
     attribute(:attribute_value)
 
     # @param [Nokogiri::XML::Node] attribute_element

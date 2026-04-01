@@ -8,7 +8,7 @@ module Saml
       include ToXml
       include LazyAttributes
 
-      attribute :protocol_support_enumeration, :string
+      attribute :protocol_support_enumeration, :string, default: "urn:oasis:names:tc:SAML:2.0:protocol"
       lazy_attribute(:protocol_support_enumeration) { role_descriptor_element&.attribute("protocolSupportEnumeration")&.value }
       attribute :error_url, :string
       lazy_attribute(:error_url) { role_descriptor_element&.attribute("errorURL")&.value }

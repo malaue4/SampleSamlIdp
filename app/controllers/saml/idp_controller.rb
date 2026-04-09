@@ -2,7 +2,6 @@
 
 module Saml
   class IdpController < ApplicationController
-    include SamlIdp::Controller
 
     protect_from_forgery
 
@@ -62,29 +61,145 @@ module Saml
             telephone_numbers: [Faker::PhoneNumber.cell_phone_in_e164],
           ),
         ],
-        role_descriptor_elements: [
-          Metadata::ServiceProviderSingleSignOnDescriptor.new(
-            protocol_support_enumeration: "urn:oasis:names:tc:SAML:2.0:protocol",
-            authn_requests_signed: true,
-            want_assertions_signed: true,
-            assertion_consumer_services: [],
-            attribute_consuming_services: [],
-          ),
-          Metadata::IdentityProviderSingleSignOnDescriptor.new(
-            want_authn_requests_signed: true,
-            single_sign_on_services: [
+        role_descriptors: [
+          Metadata::IdentityProviderSingleSignOnDescriptor.new.tap do |idp|
+            idp.name_id_formats = [
+              "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+            ]
+            idp.key_descriptors = [
+              Metadata::KeyDescriptor.new(
+                use: "signing",
+                key_info: Dsig::KeyInfo.new(
+                  key_names: ["fake_signing_key"],
+                  x509_datas: [Dsig::X509Data.new(
+                    elements:
+                      [
+                        {
+                          type: :x509_certificate,
+                          value: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...",
+                        }
+                      ]
+                  )]
+                )
+              )
+            ]
+            idp.want_authn_requests_signed = true
+            idp.single_logout_services = [
+              Metadata::SingleLogoutService.new(
+                binding: Saml::AuthnRequest::POST_BINDING,
+                location: saml_logout_url,
+                response_location: saml_logout_url,
+              )
+            ]
+            idp.single_sign_on_services = [
               Metadata::SingleSignOnService.new(
                 binding: AuthnRequest::REDIRECT_BINDING,
                 location: saml_auth_url,
-                response_location: saml_auth_url,
               ),
               Metadata::SingleSignOnService.new(
                 binding: Saml::AuthnRequest::POST_BINDING,
                 location: saml_auth_url,
-                response_location: saml_auth_url,
               ),
             ]
-          )
+            idp.saml_attributes = [
+              Attribute.new(
+                name: "urn:oid:0.9.2342.19200300.100.1.1",
+                friendly_name: "Username",
+                name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
+              ),
+              Attribute.new(
+                name: "urn:oid:2.5.4.3",
+                friendly_name: "Name",
+                name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
+              ),
+              Attribute.new(
+                name: "urn:oid:0.9.2342.19200300.100.1.3",
+                friendly_name: "Email",
+                name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
+              ),
+              Attribute.new(
+                name: "urn:oid:2.5.4.20",
+                friendly_name: "Phone",
+                name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
+              ),
+            ]
+          end,
+          Metadata::ServiceProviderSingleSignOnDescriptor.new.tap do |sp|
+            sp.id = "_#{SecureRandom.uuid}"
+            sp.valid_until = 1.hour.from_now
+            sp.cache_duration = 1.hour
+            sp.authn_requests_signed = true
+            sp.want_assertions_signed = true
+            sp.name_id_formats = [
+              "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+            ]
+            sp.single_logout_services = [
+              Metadata::SingleLogoutService.new(
+                binding: Saml::AuthnRequest::POST_BINDING,
+                location: "saml/logout",
+                response_location: "saml/logout_auth",
+              )
+            ]
+            sp.assertion_consumer_services = [
+              Metadata::AssertionConsumerService.new(
+                binding: Saml::AuthnRequest::POST_BINDING,
+                location: "saml/acs",
+                response_location: "saml/acs_auth",
+                index: 0,
+                default: true
+              )
+            ]
+            sp.attribute_consuming_services = [
+              Metadata::AttributeConsumingService.new(
+                service_name: { en: "Default Service Name" },
+                service_description: { en: "Default Service Description" },
+                requested_attributes: [
+                  Metadata::RequestedAttribute.new(
+                    friendly_name: "Name",
+                    name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+                    name: "urn:oid:2.5.4.3",
+                    required: true,
+                  ),
+                  Metadata::RequestedAttribute.new(
+                    friendly_name: "Email",
+                    name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+                    name: "urn:oid:0.9.2342.19200300.100.1.3",
+                    required: false,
+                  ),
+                  Metadata::RequestedAttribute.new(
+                    friendly_name: "Phone",
+                    name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+                    name: "urn:oid:2.5.4.20",
+                    required: false,
+                  ),
+                  Metadata::RequestedAttribute.new(
+                    friendly_name: "Preferred Language",
+                    name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
+                    name: "urn:oid:2.16.840.1.113730.3.1.39",
+                    required: false,
+                  ),
+                ],
+                index: 0,
+                default: true,
+              )
+            ]
+            sp.key_descriptors = [
+              Metadata::KeyDescriptor.new(
+                use: "signing",
+                key_info: Dsig::KeyInfo.new(
+                  key_names: ["fake_signing_key"],
+                  x509_datas: [Dsig::X509Data.new(
+                    elements: [
+                      {
+                        type: :x509_certificate,
+                        value: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...",
+                      }
+                    ]
+                  )],
+                )
+              )
+            ]
+          end
         ]
       )
 

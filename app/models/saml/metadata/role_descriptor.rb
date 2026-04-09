@@ -12,7 +12,7 @@ module Saml
       lazy_attribute(:id) { role_descriptor_element&.attribute("ID")&.value }
       attribute :valid_until, :datetime
       lazy_attribute(:valid_until) { role_descriptor_element&.attribute("validUntil")&.value }
-      attribute :cache_duration, :string
+      attribute :cache_duration
       lazy_attribute(:cache_duration) { role_descriptor_element&.attribute("cacheDuration")&.value }
       attribute :protocol_support_enumeration, :string, default: "urn:oasis:names:tc:SAML:2.0:protocol"
       lazy_attribute(:protocol_support_enumeration) { role_descriptor_element&.attribute("protocolSupportEnumeration")&.value }
@@ -51,6 +51,10 @@ module Saml
       def initialize(role_descriptor_element: nil, **attributes)
         super(attributes)
         @role_descriptor_element = role_descriptor_element
+      end
+
+      def signing_certificate
+        key_descriptors.find { |k| k.use == "signing" }.certificate
       end
 
       private

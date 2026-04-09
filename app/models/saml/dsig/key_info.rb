@@ -34,6 +34,10 @@ module Saml
         end
       end
 
+      def certificate
+        x509_datas.first&.certificate
+      end
+
       private
 
         attr_reader :key_info_element

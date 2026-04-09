@@ -17,6 +17,10 @@ module Saml
         end
       end
 
+      def certificate
+        elements.find { |el| el[:type] == :x509_certificate }&.dig(:value)
+      end
+
       private
 
         attr_reader :element

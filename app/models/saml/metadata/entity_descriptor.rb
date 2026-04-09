@@ -23,7 +23,9 @@ module Saml
         parse_additional_metadata_locations
       end
 
-      attr_accessor :role_descriptor_elements
+      attribute :role_descriptors
+      lazy_attribute(:role_descriptors) { parse_role_descriptors }
+
       attr_reader :raw_xml
 
       validates :cache_duration, presence:  { if: proc { |ed| ed.root? && ed.valid_until.nil? } }
@@ -98,30 +100,28 @@ module Saml
         @root ||= entity_descriptor_element.parent.nil?
       end
 
-      def role_descriptor_elements
-        @role_descriptor_elements ||= begin
-          entity_descriptor_element
-            &.xpath([
-                     "md:RoleDescriptor",
-                     "md:IDPSSODescriptor",
-                     "md:SPSSODescriptor",
-                     "md:AuthnAuthorityDescriptor",
-                     "md:AttributeAuthorityDescriptor",
-                     "md:PDPDescriptor"
-                   ].join(" | "), "md" => Namespaces::MD)
-            &.map { |rd| RoleDescriptor.parse(rd) } || []
-        end
+      def parse_role_descriptors
+        entity_descriptor_element
+          &.xpath(%w[
+            md:RoleDescriptor
+            md:IDPSSODescriptor
+            md:SPSSODescriptor
+            md:AuthnAuthorityDescriptor
+            md:AttributeAuthorityDescriptor
+            md:PDPDescriptor
+          ].join(" | "), "md" => Namespaces::MD)
+          &.map { |rd| RoleDescriptor.parse(rd) } || []
       end
 
 
       # @return [Saml::Metadata::ServiceProviderSingleSignOnDescriptor, nil]
       def sp_sso_descriptor
-        @sp_sso_descriptor ||= role_descriptor_elements.find { |rd| rd.is_a?(ServiceProviderSingleSignOnDescriptor) }
+        @sp_sso_descriptor ||= role_descriptors.find { |rd| rd.is_a?(ServiceProviderSingleSignOnDescriptor) }
       end
 
       # @return [Saml::Metadata::IdentityProviderSingleSignOnDescriptor, nil]
       def idp_sso_descriptor
-        @idp_sso_descriptor ||= role_descriptor_elements.find { |rd| rd.is_a?(IdentityProviderSingleSignOnDescriptor) }
+        @idp_sso_descriptor ||= role_descriptors.find { |rd| rd.is_a?(IdentityProviderSingleSignOnDescriptor) }
       end
 
       private
@@ -141,7 +141,7 @@ module Saml
 
         def xml_content(builder)
           # extensions&.build_xml(builder)
-          role_descriptor_elements.each do |role_descriptor|
+          role_descriptors.each do |role_descriptor|
             role_descriptor.build_xml(builder)
           end
           organization&.build_xml(builder)

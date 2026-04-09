@@ -78,7 +78,7 @@ XML
         )
         entity = EntityDescriptor.new(
           entity_id: "http://example.org/idp",
-          role_descriptor_elements: [idp_descriptor]
+          role_descriptors: [idp_descriptor]
         )
         assert_equal "http://example.org/idp", entity.entity_id
         xml = entity.to_xml

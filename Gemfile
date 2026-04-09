@@ -31,7 +31,7 @@ gem "cancancan", "~> 3.6"
 
 gem "bootstrap_form", "~> 5"
 
-gem "pagy", "~> 9.4"
+gem "pagy", "~> 43.5"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]

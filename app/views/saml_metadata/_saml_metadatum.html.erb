@@ -57,18 +57,23 @@
           <%= debug saml_metadatum.parsed_metadata.as_json %>
         </div>
         <div class="tab-pane active m-n3" id="<%= dom_id saml_metadatum %>-xslt">
-          <iframe class="w-100" height="750" srcdoc="<%=
-            # Parse the XML document
-            xml_doc = Nokogiri::XML(saml_metadatum.config["raw"])
+          <% styled_metadata_htmldoc = capture do %>
+            <% cache(saml_metadatum) do %>
+              <%=
+                # Parse the XML document
+                xml_doc = Nokogiri::XML(saml_metadatum.config["raw"])
 
-            # Load the XSLT stylesheet
-            xslt = Nokogiri::XSLT(Rails.root.join("public/saml-metadata.xsl"))
+                # Load the XSLT stylesheet
+                xslt = Nokogiri::XSLT(Rails.root.join("public/saml-metadata.xsl").read)
 
-            # Transform the document
-            result = xslt.transform(xml_doc)
+                # Transform the document
+                result = xslt.transform(xml_doc)
 
-            result.to_html
-          %>">
+                result.to_html
+              %>
+            <% end %>
+          <% end %>
+          <iframe class="w-100" height="750" srcdoc="<%= styled_metadata_htmldoc %>">
           </iframe>
         </div>
       </div>

@@ -6,39 +6,9 @@ class SamlMetadatum < ApplicationRecord
     refresh_metadata if metadata_url.present? && metadata_url_changed?
   end
 
+  # @return [Saml::Metadata::EntityDescriptor]
   def parsed_metadata
-    @parsed_metadata ||= begin
-      im = SamlIdp::IncomingMetadata.new config["raw"]
-      im.define_singleton_method(:role_descriptor_document) { im.service_provider_descriptor_document }
-      im.define_singleton_method(:display_name) do
-        xpath("//md:SPSSODescriptor/md:Extensions/mdui:UIInfo/mdui:DisplayName",
-              md: Saml::XML::Namespaces::METADATA,
-              mdui: "urn:oasis:names:tc:SAML:metadata:ui"
-        ).first&.content || ""
-      end
-      im.define_singleton_method(:logo) do
-        xpath("//md:SPSSODescriptor/md:Extensions/mdui:UIInfo/mdui:Logo",
-              md: Saml::XML::Namespaces::METADATA,
-              mdui: "urn:oasis:names:tc:SAML:metadata:ui"
-        ).first&.content || ""
-      end
-      {
-        entity_id: im.entity_id,
-        display_name: im.display_name,
-        assertion_consumer_services: im.assertion_consumer_services,
-        single_logout_services: im.single_logout_services,
-        name_id_formats: im.name_id_formats,
-        signing_certificate: "-----BEGIN CERTIFICATE-----\n#{im.signing_certificate}\n-----END CERTIFICATE-----\n",
-        cert: im.signing_certificate,
-        encryption_certificate: im.encryption_certificate,
-        contact_person: im.contact_person,
-        sign_assertions: im.sign_assertions,
-        sign_authn_request: im.sign_authn_request,
-        logo: im.logo.squish,
-        fingerprint:
-          im.signing_certificate.present? && SamlIdp::Fingerprint.certificate_digest("-----BEGIN CERTIFICATE-----\n#{im.signing_certificate}\n-----END CERTIFICATE-----\n"),
-      }
-    end
+    @parsed_metadata ||= Saml::Metadata::EntityDescriptor.parse(config["raw"])
   end
 
   private

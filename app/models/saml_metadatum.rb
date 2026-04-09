@@ -11,6 +11,15 @@ class SamlMetadatum < ApplicationRecord
     @parsed_metadata ||= Saml::Metadata::EntityDescriptor.parse(config["raw"])
   end
 
+  def raw_xml
+    @raw_xml ||= config["raw"]
+  end
+
+  def raw_xml=(xml)
+    self.config ||= {}
+    config["raw"] = xml
+  end
+
   private
 
     def refresh_metadata

@@ -30,11 +30,16 @@
           </button>
         </li>
         <li class="nav-item">
-          <button class="nav-link active" type="button"
+          <button class="nav-link" type="button"
                   data-bs-toggle="tab" data-bs-target="#<%= dom_id saml_metadatum %>-parsed">
             Parsed Metadata
           </button>
         </li>
+        <li class="nav-item">
+          <button class="nav-link active" type="button"
+                  data-bs-toggle="tab" data-bs-target="#<%= dom_id saml_metadatum %>-xslt">
+            XSLT
+          </button>
       </ul>
     </div>
     <div class="card-body">
@@ -47,18 +52,27 @@
           %>
           <pre class="m-0 highlight"><%= raw formatter.format(lexer.lex(source)) %></pre>
         </div>
-        <div class="tab-pane active" id="<%= dom_id saml_metadatum %>-parsed">
-          <%= image_tag(saml_metadatum.parsed_metadata[:logo], class: "img-fluid") if saml_metadatum.parsed_metadata[:logo] %>
-          <%= debug saml_metadatum.parsed_metadata %>
-          <% cert_url = "about:certificate?" %>
-          <% cert_url += { cert: saml_metadatum.parsed_metadata[:signing_certificate] }.to_query %>
-          <%= link_to "Signing Certificate", cert_url %>
+        <div class="tab-pane" id="<%= dom_id saml_metadatum %>-parsed">
+          <%= image_tag(saml_metadatum.parsed_metadata.logo, class: "img-fluid") if saml_metadatum.parsed_metadata.respond_to?(:logo) %>
+          <%= debug saml_metadatum.parsed_metadata.as_json %>
+        </div>
+        <div class="tab-pane active m-n3" id="<%= dom_id saml_metadatum %>-xslt">
+          <iframe class="w-100" height="750" srcdoc="<%=
+            # Parse the XML document
+            xml_doc = Nokogiri::XML(saml_metadatum.config["raw"])
+
+            # Load the XSLT stylesheet
+            xslt = Nokogiri::XSLT(Rails.root.join("public/saml-metadata.xsl"))
+
+            # Transform the document
+            result = xslt.transform(xml_doc)
+
+            result.to_html
+          %>">
+          </iframe>
         </div>
       </div>
     </div>
-
-
-    <div class="tab-content"></div>
     <style><%= Rouge::Themes::Pastie.render %></style>
   </div>
 

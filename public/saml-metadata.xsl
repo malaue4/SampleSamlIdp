@@ -196,6 +196,7 @@
             max-height: 80px;
             overflow: hidden;
             position: relative;
+            white-space: preserve-breaks;
           }
           .cert-data::after {
             content: '';

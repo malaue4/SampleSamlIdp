@@ -1,5 +1,4 @@
 class User < ApplicationRecord
-
   has_many :user_sessions, dependent: :delete_all
   has_one :active_session, ->(user) {
     where(id: user.user_sessions.maximum(:id), expires_at: Time.current..)

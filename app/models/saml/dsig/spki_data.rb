@@ -2,7 +2,7 @@
 
 module Saml
   module Dsig
-    class SPKIData
+    class SpkiData
       include ActiveModel::Model
       include ActiveModel::Attributes
       include LazyAttributes
@@ -43,6 +43,10 @@ module Saml
               builder << el[:xml]
             end
           end
+        end
+
+        def xml_element_name
+          :SPKIData
         end
     end
   end

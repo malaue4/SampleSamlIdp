@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "pgp_data"
-require_relative "spki_data"
-
 module Saml
   module Dsig
     class KeyInfo
@@ -78,7 +75,7 @@ module Saml
           return [] unless key_info_element.present?
 
           key_info_element.xpath("ds:SPKIData", ds: Namespaces::DS).map do |it|
-            ::Saml::Dsig::SPKIData.parse(it)
+            ::Saml::Dsig::SpkiData.parse(it)
           end
         end
 

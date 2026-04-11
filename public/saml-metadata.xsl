@@ -23,6 +23,7 @@
         <title>SAML Metadata Viewer</title>
         <style><![CDATA[
           :root {
+            /* Dark mode (default) */
             --bg:         #0f1117;
             --surface:    #1a1d27;
             --surface2:   #22263a;
@@ -37,6 +38,53 @@
             --radius:     12px;
             --font:       'Segoe UI', system-ui, -apple-system, sans-serif;
             --mono:       'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+
+            /* Badge/Element Opacity-based Colors */
+            --badge-bg-blue:   rgba(108,143,255,.15);
+            --badge-border-blue: rgba(108,143,255,.3);
+            --badge-bg-purple: rgba(167,139,250,.15);
+            --badge-border-purple: rgba(167,139,250,.3);
+            --badge-bg-green:  rgba(52,211,153,.15);
+            --badge-border-green: rgba(52,211,153,.3);
+            --badge-bg-yellow: rgba(251,191,36,.15);
+            --badge-border-yellow: rgba(251,191,36,.3);
+            --badge-bg-red:    rgba(248,113,113,.15);
+            --badge-border-red: rgba(248,113,113,.3);
+            --ep-row-border: rgba(46,51,82,.5);
+            --attr-border: rgba(46,51,82,.5);
+            --cert-fade: linear-gradient(transparent, var(--bg));
+            --mdui-logo-bg: white;
+          }
+
+          @media (prefers-color-scheme: light) {
+            :root {
+              --bg:         #f8fafc;
+              --surface:    #ffffff;
+              --surface2:   #f1f5f9;
+              --border:     #e2e8f0;
+              --accent:     #2563eb;
+              --accent2:    #7c3aed;
+              --green:      #059669;
+              --yellow:     #d97706;
+              --red:        #dc2626;
+              --text:       #1e293b;
+              --muted:      #64748b;
+
+              /* Light mode badge adjustments (stronger contrast) */
+              --badge-bg-blue:   rgba(37,99,235,.08);
+              --badge-border-blue: rgba(37,99,235,.2);
+              --badge-bg-purple: rgba(124,58,237,.08);
+              --badge-border-purple: rgba(124,58,237,.2);
+              --badge-bg-green:  rgba(5,150,105,.08);
+              --badge-border-green: rgba(5,150,105,.2);
+              --badge-bg-yellow: rgba(217,119,6,.08);
+              --badge-border-yellow: rgba(217,119,6,.2);
+              --badge-bg-red:    rgba(220,38,38,.08);
+              --badge-border-red: rgba(220,38,38,.2);
+              --ep-row-border: #f1f5f9;
+              --attr-border: #f1f5f9;
+              --mdui-logo-bg: transparent;
+            }
           }
           * { box-sizing: border-box; margin: 0; padding: 0; }
           body {
@@ -137,11 +185,11 @@
             font-weight: 600;
             letter-spacing: .03em;
           }
-          .badge-blue   { background: rgba(108,143,255,.15); color: var(--accent);  border: 1px solid rgba(108,143,255,.3); }
-          .badge-purple { background: rgba(167,139,250,.15); color: var(--accent2); border: 1px solid rgba(167,139,250,.3); }
-          .badge-green  { background: rgba(52,211,153,.15);  color: var(--green);   border: 1px solid rgba(52,211,153,.3); }
-          .badge-yellow { background: rgba(251,191,36,.15);  color: var(--yellow);  border: 1px solid rgba(251,191,36,.3); }
-          .badge-red    { background: rgba(248,113,113,.15); color: var(--red);     border: 1px solid rgba(248,113,113,.3); }
+          .badge-blue   { background: var(--badge-bg-blue); color: var(--accent);  border: 1px solid var(--badge-border-blue); }
+          .badge-purple { background: var(--badge-bg-purple); color: var(--accent2); border: 1px solid var(--badge-border-purple); }
+          .badge-green  { background: var(--badge-bg-green);  color: var(--green);   border: 1px solid var(--badge-border-green); }
+          .badge-yellow { background: var(--badge-bg-yellow);  color: var(--yellow);  border: 1px solid var(--badge-border-yellow); }
+          .badge-red    { background: var(--badge-bg-red); color: var(--red);     border: 1px solid var(--badge-border-red); }
 
           /* ── Endpoint table ── */
           .ep-table { width: 100%; border-collapse: collapse; }
@@ -157,7 +205,7 @@
           }
           .ep-table td {
             padding: 10px 12px;
-            border-bottom: 1px solid rgba(46,51,82,.5);
+            border-bottom: 1px solid var(--ep-row-border);
             vertical-align: top;
           }
           .ep-table tr:last-child td { border-bottom: none; }
@@ -174,7 +222,7 @@
 
           /* ── Certificate ── */
           .cert-block {
-            background: var(--bg);
+            background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 12px 16px;
@@ -203,14 +251,14 @@
             position: absolute;
             bottom: 0; left: 0; right: 0;
             height: 24px;
-            background: linear-gradient(transparent, var(--bg));
+            background: var(--cert-fade);
           }
 
           /* ── Attributes ── */
           .attr-list { list-style: none; }
           .attr-list li {
             padding: 8px 0;
-            border-bottom: 1px solid rgba(46,51,82,.5);
+            border-bottom: 1px solid var(--attr-border);
             display: flex;
             align-items: flex-start;
             gap: 8px;
@@ -227,7 +275,7 @@
             gap: 12px;
           }
           .contact-card {
-            background: var(--bg);
+            background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 12px 16px;
@@ -265,14 +313,14 @@
             margin-bottom: 16px;
           }
           .role-idp {
-            background: rgba(108,143,255,.15);
+            background: var(--badge-bg-blue);
             color: var(--accent);
-            border: 1px solid rgba(108,143,255,.3);
+            border: 1px solid var(--badge-border-blue);
           }
           .role-sp {
-            background: rgba(167,139,250,.15);
+            background: var(--badge-bg-purple);
             color: var(--accent2);
-            border: 1px solid rgba(167,139,250,.3);
+            border: 1px solid var(--badge-border-purple);
           }
 
           /* ── Validity ── */
@@ -313,7 +361,7 @@
             width: 64px; height: 64px;
             border-radius: 8px;
             object-fit: contain;
-            background: white;
+            background: var(--mdui-logo-bg);
             padding: 4px;
           }
         ]]></style>

@@ -125,14 +125,14 @@ CERT
   ## EXAMPLE ##
   config.attributes = {
     Name: {
-      getter: :name,
+      getter: :name
     },
     Email: {
-      getter: :email,
+      getter: :email
     },
     PhoneNumber: {
-      getter: :phone,
-    },
+      getter: :phone
+    }
   }
   ## EXAMPLE ##
 
@@ -170,8 +170,8 @@ CERT
 
       # We now validate AssertionConsumerServiceURL will match the MetadataURL set above.
       # *If* it's not going to match your Metadata URL's Host, then set this so we can validate the host using this list
-      response_hosts: ["localhost"]
-    },
+      response_hosts: [ "localhost" ]
+    }
   }
 
   # `identifier` is the entity_id or issuer of the Service Provider,
@@ -186,7 +186,7 @@ CERT
   # `identifier` is the entity_id or issuer of the Service Provider,
   # `service_provider` is a ServiceProvider object. Based on the `identifier` or the
   # `service_provider` you should return the settings.to_h from above
-  config.service_provider.persisted_metadata_getter = ->(identifier, service_provider){
+  config.service_provider.persisted_metadata_getter = ->(identifier, service_provider) {
     data = SamlMetadatum.find_by!(entity_id: identifier)
     data.parsed_metadata
   }

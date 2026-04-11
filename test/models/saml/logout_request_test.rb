@@ -4,7 +4,6 @@ require "test_helper"
 
 module Saml
   class LogoutRequestTest < ActiveSupport::TestCase
-
     def setup
       # Do nothing
     end

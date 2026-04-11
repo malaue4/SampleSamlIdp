@@ -20,7 +20,7 @@ User.delete_all
   else
     [
       Faker::Internet.unique.username(specifier: name),
-      Faker::Internet.password,
+      Faker::Internet.password
     ]
   end
   user = User.create!(
@@ -35,7 +35,7 @@ User.delete_all
       job: Faker::Job.title,
       company: Faker::Company.name,
       address: Faker::Address.full_address,
-      country: Faker::Address.country,
+      country: Faker::Address.country
     }
   )
   avatar_url = Faker::Avatar.image(slug: username, size: "300x300", format: "png", set: "any", bgset: "any")
@@ -44,7 +44,7 @@ User.delete_all
   30.times do
     created_at_date = Faker::Date.between(from: 1.month.ago, to: Date.today)
     session_length = rand(15..120).minutes
-    time_of_day = [generator.rng, 0, 23.99].sort[1].hours
+    time_of_day = [ generator.rng, 0, 23.99 ].sort[1].hours
     created_at = created_at_date + time_of_day
     user.user_sessions.create!(
       created_at: created_at,

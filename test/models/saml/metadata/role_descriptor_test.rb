@@ -5,7 +5,6 @@ require "test_helper"
 module Saml
   module Metadata
     class RoleDescriptorTest < ActiveSupport::TestCase
-
       test "parse RoleDescriptor" do
         xml = <<~XML
           <md:RoleDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
@@ -35,7 +34,7 @@ module Saml
         assert_instance_of IdentityProviderSingleSignOnDescriptor, idp
         assert_equal "urn:oasis:names:tc:SAML:2.0:protocol", idp.protocol_support_enumeration
         assert_equal true, idp.want_authn_requests_signed
-        assert_equal ["urn:oasis:names:tc:SAML:2.0:nameid-format:transient"], idp.name_id_formats
+        assert_equal [ "urn:oasis:names:tc:SAML:2.0:nameid-format:transient" ], idp.name_id_formats
         assert_equal 1, idp.single_sign_on_services.size
         assert_equal "http://idp.example.com/sso", idp.single_sign_on_services.first.location
       end
@@ -65,8 +64,8 @@ module Saml
         idp = IdentityProviderSingleSignOnDescriptor.new(
           protocol_support_enumeration: "urn:oasis:names:tc:SAML:2.0:protocol",
           want_authn_requests_signed: true,
-          name_id_formats: ["urn:oasis:names:tc:SAML:2.0:nameid-format:transient"],
-          single_sign_on_services: [sso_service]
+          name_id_formats: [ "urn:oasis:names:tc:SAML:2.0:nameid-format:transient" ],
+          single_sign_on_services: [ sso_service ]
         )
 
         xml = idp.to_xml
@@ -83,7 +82,7 @@ module Saml
           protocol_support_enumeration: "urn:oasis:names:tc:SAML:2.0:protocol",
           authn_requests_signed: true,
           want_assertions_signed: true,
-          assertion_consumer_services: [acs]
+          assertion_consumer_services: [ acs ]
         )
 
         xml = sp.to_xml

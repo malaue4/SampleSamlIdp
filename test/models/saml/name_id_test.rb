@@ -4,7 +4,6 @@ require "test_helper"
 
 module Saml
   class NameIdTest < ActiveSupport::TestCase
-
     SAMPLE_XML = <<~XML
       <?xml version="1.0" encoding="utf-8"?>
       <saml:NameID Format="bad" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">

@@ -42,7 +42,7 @@ module LazyAttributes
     #   end
     #
     def lazy_attribute(name, allow_nil: false, &block)
-      self.lazy_attribute_names += [name.to_sym]
+      self.lazy_attribute_names += [ name.to_sym ]
 
       if allow_nil
         define_method(name) do

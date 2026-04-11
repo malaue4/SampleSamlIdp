@@ -4,7 +4,6 @@ require "test_helper"
 
 module Saml
   class RequestTest < Minitest::Test
-
     AUTHN_REQUEST_XML = <<-XML
       <samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="id-1234567890" Version="2.0" IssueInstant="2013-03-18T03:24:19Z" Destination="https://idp.example.com/idp/profile/SAML2/Redirect/SSO" ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect">
         <saml:Issuer>https://idp.example.com/idp/shibboleth</saml:Issuer>
@@ -97,7 +96,7 @@ module Saml
       {
         "test" => "+I-.\x01\x00".dup.force_encoding("ASCII-8BIT"),
         "these" => "+\xC9H-N\x05\x00".dup.force_encoding("ASCII-8BIT"),
-        "strings" => "+.)\xCA\xCCK/\x06\x00".dup.force_encoding("ASCII-8BIT"),
+        "strings" => "+.)\xCA\xCCK/\x06\x00".dup.force_encoding("ASCII-8BIT")
       }.each do |inflated_word, deflated_word|
         assert_equal deflated_word, Compression.deflate(inflated_word)
       end
@@ -107,7 +106,7 @@ module Saml
       {
         "test" => "+I-.\x01\x00".dup.force_encoding("ASCII-8BIT"),
         "these" => "+\xC9H-N\x05\x00".dup.force_encoding("ASCII-8BIT"),
-        "strings" => "+.)\xCA\xCCK/\x06\x00".dup.force_encoding("ASCII-8BIT"),
+        "strings" => "+.)\xCA\xCCK/\x06\x00".dup.force_encoding("ASCII-8BIT")
       }.each do |inflated_word, deflated_word|
         assert_equal inflated_word, Compression.inflate(deflated_word)
       end
@@ -131,7 +130,7 @@ module Saml
 
       assert req.verify_signature(certificate)
     end
-    
+
     private
 
       # Generates a self-signed certificate.
@@ -142,11 +141,11 @@ module Saml
         cert = OpenSSL::X509::Certificate.new
         cert.version = 2
         cert.subject = OpenSSL::X509::Name.new([
-                                                 ["C", "US"],
-                                                 ["ST", "California"],
-                                                 ["L", "San Francisco"],
-                                                 ["O", "Test Organization"],
-                                                 ["CN", "test.example.com"]
+                                                 [ "C", "US" ],
+                                                 [ "ST", "California" ],
+                                                 [ "L", "San Francisco" ],
+                                                 [ "O", "Test Organization" ],
+                                                 [ "CN", "test.example.com" ]
                                                ])
         cert.issuer = cert.subject
         cert.public_key = private_key.public_key

@@ -8,6 +8,5 @@ module Saml
     class ArtifactResolutionService < EndpointWithoutResponseLocation
       include IndexedEndpoint
     end
-
   end
 end

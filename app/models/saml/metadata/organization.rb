@@ -13,7 +13,7 @@ module Saml
 
       # @param [Nokogiri::XML::Node] organization_node
       def self.parse(organization_node)
-        to_local_string = ->(nodes) { nodes.to_h { |node| [node.attribute_with_ns("lang", Namespaces::XML)&.value, node.text]} }
+        to_local_string = ->(nodes) { nodes.to_h { |node| [ node.attribute_with_ns("lang", Namespaces::XML)&.value, node.text ] } }
         new(
           name: to_local_string.(organization_node.xpath("md:OrganizationName", "md" => Namespaces::MD)),
           display_name: to_local_string.(organization_node.xpath("md:OrganizationDisplayName", "md" => Namespaces::MD)),

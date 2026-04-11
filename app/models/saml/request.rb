@@ -13,13 +13,13 @@ module Saml
     attr_accessor :metadata
 
     attribute :id, :string
-    lazy_attribute(:id) { request_element.attribute('ID').value }
+    lazy_attribute(:id) { request_element.attribute("ID").value }
     attribute :version, :string
-    lazy_attribute(:version) { request_element.attribute('Version').value }
+    lazy_attribute(:version) { request_element.attribute("Version").value }
     attribute :issue_instant, :string
-    lazy_attribute(:issue_instant) { request_element.attribute('IssueInstant').value }
+    lazy_attribute(:issue_instant) { request_element.attribute("IssueInstant").value }
     attribute :destination, :string
-    lazy_attribute(:destination) { request_element.attribute('Destination')&.value }
+    lazy_attribute(:destination) { request_element.attribute("Destination")&.value }
     attribute :consent, :string
     lazy_attribute(:consent) { request_element["Consent"] }
     attribute :issuer
@@ -39,6 +39,7 @@ module Saml
     validate :verify_signature, if: :signed?
 
 
+    # @return [Saml::Request]
     def self.parse(maybe_encoded_request)
       decoded_request = Encoding.decode_if_needed(maybe_encoded_request)
       raw_request = Compression.inflate_if_needed(decoded_request)

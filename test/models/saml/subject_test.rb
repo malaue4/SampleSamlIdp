@@ -34,7 +34,7 @@ module Saml
       name_id = NameId.new(value: "user@example.com", format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
       data = SubjectConfirmation::Data.new(recipient: "https://sp.example.com/acs", not_on_or_after: "2025-01-01T13:00:00Z".to_time)
       confirmation = SubjectConfirmation.new(method: "urn:oasis:names:tc:SAML:2.0:cm:bearer", subject_confirmation_data: data)
-      subject = Subject.new(user_id: name_id, subject_confirmations: [confirmation])
+      subject = Subject.new(user_id: name_id, subject_confirmations: [ confirmation ])
 
       xml = subject.to_xml
       document = Nokogiri::XML(xml)

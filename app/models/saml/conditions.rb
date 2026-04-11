@@ -29,7 +29,7 @@ module Saml
       def xml_attributes
         {
           NotBefore: not_before&.iso8601,
-          NotOnOrAfter: not_on_or_after&.iso8601,
+          NotOnOrAfter: not_on_or_after&.iso8601
         }.compact
       end
 

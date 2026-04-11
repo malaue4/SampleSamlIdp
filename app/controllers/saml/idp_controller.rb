@@ -2,7 +2,6 @@
 
 module Saml
   class IdpController < ApplicationController
-
     protect_from_forgery
 
     attr_reader :saml_request
@@ -41,45 +40,45 @@ module Saml
             company: organization_name,
             given_name: name = Faker::Name.first_name,
             sur_name: lname = Faker::Name.last_name,
-            email_addresses: [Faker::Internet.email(name: "#{name} #{lname}")],
-            telephone_numbers: [Faker::PhoneNumber.cell_phone_in_e164],
+            email_addresses: [ Faker::Internet.email(name: "#{name} #{lname}") ],
+            telephone_numbers: [ Faker::PhoneNumber.cell_phone_in_e164 ],
           ),
           Metadata::ContactPerson.new(
             contact_type: "support",
             company: organization_name,
             given_name: name = Faker::Name.first_name,
             sur_name: lname = Faker::Name.last_name,
-            email_addresses: [Faker::Internet.email(name: "#{name} #{lname}")],
-            telephone_numbers: [Faker::PhoneNumber.cell_phone_in_e164],
+            email_addresses: [ Faker::Internet.email(name: "#{name} #{lname}") ],
+            telephone_numbers: [ Faker::PhoneNumber.cell_phone_in_e164 ],
           ),
           Metadata::ContactPerson.new(
             contact_type: "billing",
             company: organization_name,
             given_name: name = Faker::Name.first_name,
             sur_name: lname = Faker::Name.last_name,
-            email_addresses: [Faker::Internet.email(name: "#{name} #{lname}")],
-            telephone_numbers: [Faker::PhoneNumber.cell_phone_in_e164],
-          ),
+            email_addresses: [ Faker::Internet.email(name: "#{name} #{lname}") ],
+            telephone_numbers: [ Faker::PhoneNumber.cell_phone_in_e164 ],
+          )
         ],
         role_descriptors: [
           Metadata::IdentityProviderSingleSignOnDescriptor.new.tap do |idp|
             idp.name_id_formats = [
-              "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+              "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
             ]
             idp.key_descriptors = [
               Metadata::KeyDescriptor.new(
                 use: "signing",
                 key_info: Dsig::KeyInfo.new(
-                  key_names: ["fake_signing_key"],
-                  x509_datas: [Dsig::X509Data.new(
+                  key_names: [ "fake_signing_key" ],
+                  x509_datas: [ Dsig::X509Data.new(
                     elements:
                       [
                         {
                           type: :x509_certificate,
-                          value: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...",
+                          value: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
                         }
                       ]
-                  )]
+                  ) ]
                 )
               )
             ]
@@ -99,7 +98,7 @@ module Saml
               Metadata::SingleSignOnService.new(
                 binding: Saml::AuthnRequest::POST_BINDING,
                 location: saml_auth_url,
-              ),
+              )
             ]
             idp.saml_attributes = [
               Attribute.new(
@@ -121,7 +120,7 @@ module Saml
                 name: "urn:oid:2.5.4.20",
                 friendly_name: "Phone",
                 name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
-              ),
+              )
             ]
           end,
           Metadata::ServiceProviderSingleSignOnDescriptor.new.tap do |sp|
@@ -131,7 +130,7 @@ module Saml
             sp.authn_requests_signed = true
             sp.want_assertions_signed = true
             sp.name_id_formats = [
-              "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+              "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
             ]
             sp.single_logout_services = [
               Metadata::SingleLogoutService.new(
@@ -177,7 +176,7 @@ module Saml
                     name_format: "urn:oasis:names:tc:SAML:2.0:attrname-format:uri",
                     name: "urn:oid:2.16.840.1.113730.3.1.39",
                     required: false,
-                  ),
+                  )
                 ],
                 index: 0,
                 default: true,
@@ -187,15 +186,15 @@ module Saml
               Metadata::KeyDescriptor.new(
                 use: "signing",
                 key_info: Dsig::KeyInfo.new(
-                  key_names: ["fake_signing_key"],
-                  x509_datas: [Dsig::X509Data.new(
+                  key_names: [ "fake_signing_key" ],
+                  x509_datas: [ Dsig::X509Data.new(
                     elements: [
                       {
                         type: :x509_certificate,
-                        value: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...",
+                        value: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
                       }
                     ]
-                  )],
+                  ) ],
                 )
               )
             ]

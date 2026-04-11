@@ -20,7 +20,7 @@ module Saml
         attribute_value: attribute_element
           .xpath("saml:AttributeValue", "saml" => Namespaces::SAML)
           .map { |av| AttributeValue.parse(av) }
-          .then { |values| values.size > 1 ? values : values.first },
+          .then { |values| values.size > 1 ? values : values.first }
       }
       yield attributes if block_given?
       new(attributes)

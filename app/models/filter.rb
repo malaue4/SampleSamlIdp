@@ -9,7 +9,7 @@ class Filter
   def self.range_attribute(name, type, after: "#{name}_after", before: "#{name}_before")
     attribute after, type
     attribute before, type
-    self.range_attributes += [[name, after, before]]
+    self.range_attributes += [ [ name, after, before ] ]
   end
 
   range_attribute :created_at, :datetime, after: :created_after, before: :created_before

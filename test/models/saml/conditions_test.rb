@@ -21,7 +21,7 @@ module Saml
 
       assert_equal "2025-01-01T12:00:00Z".to_time, conditions.not_before
       assert_equal "2025-01-01T13:00:00Z".to_time, conditions.not_on_or_after
-      assert_equal ["https://sp.example.com/metadata"], conditions.audience_restrictions
+      assert_equal [ "https://sp.example.com/metadata" ], conditions.audience_restrictions
       assert conditions.one_time_use
     end
 
@@ -29,7 +29,7 @@ module Saml
       conditions = Conditions.new(
         not_before: "2025-01-01T12:00:00Z",
         not_on_or_after: "2025-01-01T13:00:00Z",
-        audience_restrictions: ["https://sp.example.com/metadata"],
+        audience_restrictions: [ "https://sp.example.com/metadata" ],
         one_time_use: true
       )
 

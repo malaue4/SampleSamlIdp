@@ -5,7 +5,6 @@ require "test_helper"
 module Saml
   module Dsig
     class KeyInfoTest < ActiveSupport::TestCase
-
       SAMPLE_XML = <<~XML
         <ds:KeyInfo Id="key1" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
           <ds:KeyName>Main Key</ds:KeyName>
@@ -29,20 +28,20 @@ module Saml
 
       def test_parse
         assert_equal "key1", @key_info.id
-        assert_equal ["Main Key"], @key_info.key_names
+        assert_equal [ "Main Key" ], @key_info.key_names
         assert_equal 1, @key_info.key_values.size
         assert_equal "AModulus", @key_info.key_values.first.rsa_key_value[:modulus]
         assert_equal "AnExponent", @key_info.key_values.first.rsa_key_value[:exponent]
         assert_equal 1, @key_info.x509_datas.size
         assert_equal "ACertificate", @key_info.x509_datas.first.elements.first[:value]
-        assert_equal ["SomeMgmtData"], @key_info.mgmt_datas
+        assert_equal [ "SomeMgmtData" ], @key_info.mgmt_datas
       end
 
       def test_to_xml
         xml = @key_info.to_xml
         doc = Nokogiri::XML(xml)
         key_info = doc.at_xpath("//ds:KeyInfo", ds: Namespaces::DS)
-        
+
         assert_equal "key1", key_info["Id"]
         assert_equal "Main Key", key_info.at_xpath("ds:KeyName", ds: Namespaces::DS).text
         assert_equal "AModulus", key_info.at_xpath("ds:KeyValue/ds:RSAKeyValue/ds:Modulus", ds: Namespaces::DS).text

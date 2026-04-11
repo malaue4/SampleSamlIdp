@@ -3,7 +3,6 @@
 module Saml
   module Metadata
     class SingleSignOnDescriptor < RoleDescriptor
-
       # @!attribute [rw] name_id_formats
       #   @return [Array<String>] list of supported NameID formats
       attribute :name_id_formats

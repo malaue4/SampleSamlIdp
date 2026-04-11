@@ -2,7 +2,6 @@
 
 module Saml
   class LogoutRequest < Request
-
     attribute :name_id
     lazy_attribute(:name_id) { parse_name_id }
     attribute :session_indices

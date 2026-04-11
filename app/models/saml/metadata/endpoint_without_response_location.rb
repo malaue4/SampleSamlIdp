@@ -42,7 +42,7 @@ module Saml
         def xml_attributes
           {
             Binding: binding,
-            Location: location,
+            Location: location
           }.compact
         end
     end

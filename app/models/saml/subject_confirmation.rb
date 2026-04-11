@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Saml
-
   # The SubjectConfirmation element in SAML serves to verify that an assertion is being presented by the legitimate
   # subject it claims to represent. It acts as a proof mechanism to prevent unauthorized parties from misusing
   # assertions.
@@ -88,7 +87,7 @@ module Saml
           NotOnOrAfter: not_on_or_after&.iso8601,
           Recipient: recipient,
           InResponseTo: in_response_to,
-          Address: address,
+          Address: address
         }.compact
       end
     end

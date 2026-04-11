@@ -18,11 +18,11 @@ class User < ApplicationRecord
 
   # Avatar variant definitions
   def avatar_thumb
-    avatar.variant(resize_to_fill: [100, 100]) if avatar.attached?
+    avatar.variant(resize_to_fill: [ 100, 100 ]) if avatar.attached?
   end
 
   def avatar_medium
-    avatar.variant(resize_to_fill: [300, 300]) if avatar.attached?
+    avatar.variant(resize_to_fill: [ 300, 300 ]) if avatar.attached?
   end
 
   def persistent

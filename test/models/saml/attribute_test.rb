@@ -4,7 +4,6 @@ require "test_helper"
 
 module Saml
   class AttributeTest < ActiveSupport::TestCase
-
     NO_VALUE_EXAMPLE = <<~XML
       <saml:Attribute Name="isAdmin" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
       </saml:Attribute>

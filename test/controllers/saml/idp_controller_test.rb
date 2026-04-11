@@ -2,7 +2,6 @@ require "test_helper"
 
 module Saml
   class IdpControllerTest < ActionDispatch::IntegrationTest
-
     describe "#create" do
       before do
         SamlMetadatum.create!(
@@ -27,7 +26,7 @@ module Saml
         jolly = {
           code: saml_response.status.status_code.value,
           message: saml_response.status.status_message,
-          sub_code: saml_response.status.status_code.status_code.value,
+          sub_code: saml_response.status.status_code.status_code.value
         }
 
         assert_response :success
@@ -35,7 +34,7 @@ module Saml
           {
             code: "urn:oasis:names:tc:SAML:2.0:status:Responder",
             message: "Request cancelled by user",
-            sub_code: "urn:oasis:names:tc:SAML:2.0:status:AuthnFailed",
+            sub_code: "urn:oasis:names:tc:SAML:2.0:status:AuthnFailed"
           },
           jolly,
           "Expected a AuthnFailed sub status code",

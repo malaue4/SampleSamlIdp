@@ -29,7 +29,7 @@ module Saml
       assert_equal "2025-01-01T12:00:00Z".to_time, assertion.issue_instant
       assert_equal "https://idp.example.com/metadata", assertion.issuer.value
       assert_equal "user@example.com", assertion.subject.user_id.value
-      assert_equal ["https://sp.example.com/metadata"], assertion.conditions.audience_restrictions
+      assert_equal [ "https://sp.example.com/metadata" ], assertion.conditions.audience_restrictions
     end
 
     test "build_xml" do
@@ -38,7 +38,7 @@ module Saml
       conditions = Conditions.new(
         not_before: "2025-01-01T12:00:00Z".to_time,
         not_on_or_after: "2025-01-01T13:00:00Z".to_time,
-        audience_restrictions: ["https://sp.example.com/metadata"]
+        audience_restrictions: [ "https://sp.example.com/metadata" ]
       )
       assertion = Assertion.new(
         id: "_assertion123",

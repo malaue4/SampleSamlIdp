@@ -33,7 +33,7 @@ module Saml
           Format: format,
           SPProvidedID: sp_provided_id,
           NameQualifier: name_qualifier,
-          SPNameQualifier: sp_name_qualifier,
+          SPNameQualifier: sp_name_qualifier
         }.compact
       end
 

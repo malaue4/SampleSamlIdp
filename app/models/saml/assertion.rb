@@ -100,7 +100,7 @@ module Saml
         {
           Version: version,
           ID: id,
-          IssueInstant: issue_instant&.iso8601,
+          IssueInstant: issue_instant&.iso8601
         }.compact
       end
 

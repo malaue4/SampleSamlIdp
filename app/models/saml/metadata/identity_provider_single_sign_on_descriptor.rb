@@ -2,7 +2,6 @@
 
 module Saml
   module Metadata
-
     # Represents the Identity Provider Single Sign-On Descriptor element in SAML metadata.
     #
     # This class models the configuration and capabilities of an Identity Provider's
@@ -11,7 +10,6 @@ module Saml
     # It extends the SingleSignOnDescriptor base class and provides additional
     # attributes and methods specific to Identity Providers.
     class IdentityProviderSingleSignOnDescriptor < SingleSignOnDescriptor
-
       # @!attribute [rw] want_authn_requests_signed
       #   @return [Boolean] whether the IdP wants AuthnRequests to be signed
       attribute :want_authn_requests_signed, :boolean

@@ -14,7 +14,7 @@ module Saml
       type = attribute_element.attribute("xsi:type")&.value
       attributes = {
         type: type,
-        value: parse_attribute_value(attribute_element, xsi_type: type),
+        value: parse_attribute_value(attribute_element, xsi_type: type)
       }
       yield attributes if block_given?
       new(attributes)

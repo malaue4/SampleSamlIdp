@@ -3,7 +3,6 @@ require "test_helper"
 module Saml
   module Metadata
     class AssertionConsumerServiceTest < ActiveSupport::TestCase
-
       test "parse" do
         node = Nokogiri::XML(<<XML).at_xpath("//md:AssertionConsumerService", "md" => Namespaces::MD)
 <md:AssertionConsumerService xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://localhost:3000/saml/auth" index="0"/>

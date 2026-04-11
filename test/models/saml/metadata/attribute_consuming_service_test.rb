@@ -54,7 +54,7 @@ module Saml
                          friendly_name: "eduPersonEntitlement",
                          attribute_value: nil,
                          required: false,
-                         ).attributes,
+                         ).attributes
                      ], acs.requested_attributes.map(&:attributes))
       end
 

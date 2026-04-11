@@ -32,7 +32,7 @@ class DashboardsController < ApplicationController
       {
         name: "Unique Users",
         data: entire_period(time_range, sessions_per_day(time_range).distinct.count(:user_id))
-      },
+      }
     ]
     @user_sessions_chart_data_time_of_day = sessions_by_hour_of_day(time_range).count
   end

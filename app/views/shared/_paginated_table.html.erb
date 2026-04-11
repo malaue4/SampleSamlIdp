@@ -28,7 +28,7 @@
     <% records.each do |record| %>
       <tr>
         <td>
-          <%= link_to tag.i(record.id, class: "bi bi-search"), record %>
+          <%= link_to tag.i(record.id, class: "bi bi-search"), { action: :show, id: record.id } %>
         </td>
         <% columns.each do |column| %>
           <td>

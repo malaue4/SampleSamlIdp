@@ -5,7 +5,7 @@
         <tr>
           <th class="ps-0 text-muted" style="width: 200px">User</th>
           <td class="fw-medium">
-            <%= link_to user_session.user.name_id, user_session.user %>
+            <%= link_to user_session.user.name_id, management_user_path(id: user_session.user_id) %>
           </td>
         </tr>
         <tr>

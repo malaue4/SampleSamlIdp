@@ -1,7 +1,7 @@
 <% content_for :title, "User sessions" %>
 <% content_for :header do %>
   <h1>User sessions</h1>
-  <%= link_to "New user session", new_user_session_path %>
+  <%= link_to "New user session", { action: :new } %>
 <% end %>
 <% columns = [:user_id, :created_at, :expires_at] %>
 <%= render "shared/paginated_table", records: @user_sessions, pagy: @pagy, columns: %>

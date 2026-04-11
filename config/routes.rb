@@ -1,9 +1,13 @@
 Rails.application.routes.draw do
-  resources :saml_metadata
-  resource :dashboard, only: :show
-  resources :user_sessions
-  resources :users
-  resource :account, only: %i[show edit update]
+  namespace :management do
+    resources :saml_metadata
+    resource :dashboard, only: :show
+    resources :user_sessions
+    resources :users
+    resource :account, only: %i[show edit update]
+
+    root to: "dashboard#show"
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -26,5 +30,5 @@ Rails.application.routes.draw do
     get "attributes" => "idp#attributes"
   end
 
-  root to: redirect("/dashboard")
+  root to: redirect("/management/dashboard")
 end

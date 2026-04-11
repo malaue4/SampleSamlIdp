@@ -4,7 +4,7 @@
 <% end %>
 
 <div class="col-12 p-4">
-  <%= bootstrap_form_with(model: @user, url: account_path, method: :patch) do |form| %>
+  <%= bootstrap_form_with(model: @user, url: { action: :update }, method: :patch) do |form| %>
     <%= form.alert_message "Please fix the following errors:" %>
 
     <%= form.text_field :name, floating: true %>
@@ -30,5 +30,5 @@
 </div>
 
 <% content_for :footer do %>
-  <%= link_to "Back to Account Overview", account_path %>
+  <%= link_to "Back to Account Overview", { action: :show } %>
 <% end %>

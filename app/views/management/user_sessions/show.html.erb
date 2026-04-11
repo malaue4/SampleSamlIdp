@@ -1,7 +1,7 @@
 <% content_for :header do %>
   <div class="hstack gap-3">
     <h1 class="h3 mb-0">User Session Details</h1>
-    <%= link_to "Back to user sessions", user_sessions_path, class: "btn btn-outline-secondary btn-sm ms-auto" %>
+    <%= link_to "Back to grid", { action: :index }, class: "btn btn-outline-secondary btn-sm ms-auto" %>
   </div>
 <% end %>
 
@@ -15,10 +15,10 @@
 
 <% content_for :footer do %>
   <div class="d-flex gap-2 align-items-center">
-    <%= link_to "Edit this user session", edit_user_session_path(@user_session), class: "btn btn-primary" %>
+    <%= link_to "Edit this user session", { action: :edit }, class: "btn btn-primary" %>
 
     <div class="ms-auto">
-      <%= button_to "Destroy this user session", @user_session, method: :delete, class: "btn btn-outline-danger", data: { turbo_confirm: "Are you sure?" } %>
+      <%= button_to "Destroy this user session", { action: :destroy }, method: :delete, class: "btn btn-outline-danger", data: { turbo_confirm: "Are you sure?" } %>
     </div>
   </div>
 <% end %>

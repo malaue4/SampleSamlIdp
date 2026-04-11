@@ -9,7 +9,7 @@
 
 <% content_for :footer do %>
   <div>
-    <%= link_to "Show this user", @user %> |
-    <%= link_to "Back to users", users_path %>
+    <%= link_to "Show this user", { action: :show, id: @user.id } %> |
+    <%= link_to "Back to users", { action: :index } %>
   </div>
 <% end %>

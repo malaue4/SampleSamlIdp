@@ -61,6 +61,6 @@
 
 <% content_for :footer do %>
   <div class="d-flex gap-2 align-items-center">
-    <%= link_to "Edit Account Settings", edit_account_path, class: "btn btn-primary" %>
+    <%= link_to "Edit Account Settings", { action: :edit }, class: "btn btn-primary" %>
   </div>
 <% end %>

@@ -1,6 +1,6 @@
 <%# locals: (user_session:) -%>
 
-<%= bootstrap_form_with(model: user_session) do |form| %>
+<%= bootstrap_form_with(model: user_session, url: { action: user_session.new_record? ? :create : :update }) do |form| %>
   <%= form.alert_message t(".error", default: "Please fix the following errors:") %>
   <%= form.number_field :user_id %>
   <%= form.primary %>

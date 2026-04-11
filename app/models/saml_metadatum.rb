@@ -12,7 +12,7 @@ class SamlMetadatum < ApplicationRecord
   end
 
   def raw_xml
-    @raw_xml ||= config["raw"]
+    @raw_xml ||= config&.fetch("raw", "")
   end
 
   def raw_xml=(xml)

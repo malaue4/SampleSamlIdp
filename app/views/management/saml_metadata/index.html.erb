@@ -2,7 +2,7 @@
 
 <% content_for :header do %>
   <h1>Saml metadata</h1>
-  <%= link_to "New saml metadatum", new_saml_metadatum_path %>
+  <%= link_to "New saml metadatum", { action: :new } %>
 <% end %>
 <% columns = ["entity_id", "metadata_url", "fingerprint"] %>
 <%= render "shared/paginated_table", records: @saml_metadata, pagy: @pagy, columns: %>

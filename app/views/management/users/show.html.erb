@@ -1,7 +1,7 @@
 <% content_for :header do %>
   <div class="hstack gap-3">
     <h1 class="h3 mb-0">User Details</h1>
-    <%= link_to "Back to users", users_path, class: "btn btn-outline-secondary btn-sm ms-auto" %>
+    <%= link_to "Back to users", { action: :index }, class: "btn btn-outline-secondary btn-sm ms-auto" %>
   </div>
 <% end %>
 
@@ -15,10 +15,10 @@
 
 <% content_for :footer do %>
   <div class="d-flex gap-2 align-items-center">
-    <%= link_to "Edit this user", edit_user_path(@user), class: "btn btn-primary" %>
+    <%= link_to "Edit this user", { action: :edit, id: @user.id }, class: "btn btn-primary" %>
 
     <div class="ms-auto">
-      <%= button_to "Destroy this user", @user, method: :delete, class: "btn btn-outline-danger", data: { turbo_confirm: "Are you sure?" } %>
+      <%= button_to "Destroy this user", { action: :destroy, id: @user.id }, method: :delete, class: "btn btn-outline-danger", data: { turbo_confirm: "Are you sure?" } %>
     </div>
   </div>
 <% end %>

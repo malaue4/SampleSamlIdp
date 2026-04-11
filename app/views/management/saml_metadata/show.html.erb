@@ -1,0 +1,17 @@
+<% content_for :header do %>
+  <div class="hstack gap-3">
+    <h1 class="h3 mb-0">SAML Metadata Details</h1>
+    <%= link_to "Back to grid", { action: :index }, class: "btn btn-outline-secondary btn-sm ms-auto" %>
+  </div>
+<% end %>
+
+<%= render @saml_metadatum %>
+
+<% content_for :footer do %>
+<div class="hstack gap-1">
+  <%= link_to "Edit this saml metadatum", { action: :edit }, class: "btn btn-primary" %> |
+  <%= link_to "Back to saml metadata", { action: :index }, class: "btn btn-secondary" %>
+
+  <%= button_to "Destroy this saml metadatum", { action: :destroy }, method: :delete, class: "btn btn-danger" %>
+</div>
+<% end %>

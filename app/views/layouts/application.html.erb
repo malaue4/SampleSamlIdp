@@ -23,10 +23,10 @@
         <% [:dashboard, User, UserSession, SamlMetadatum].each do |link| %>
           <li class="nav-item">
             <%= link_to link_label(link),
-              link,
+                        [:management, link],
               class: {
                 "nav-link" => true,
-                "active" => request.fullpath.starts_with?(url_for(link))
+                "active" => request.fullpath.starts_with?(url_for([:management, link]))
               } %>
           </li>
         <% end %>
@@ -41,9 +41,9 @@
               <div class="text-truncate text-muted extra-small" style="font-size: 0.75rem;"><%= current_user.email %></div>
             </div>
           </div>
-          <%= link_to "My Account", account_path, class: [
+          <%= link_to "My Account", management_account_path, class: [
             "btn btn-sm w-100",
-            request.fullpath.starts_with?(account_path) ? "btn-primary" : "btn-outline-primary"
+            request.fullpath.starts_with?(management_account_path) ? "btn-primary" : "btn-outline-primary"
           ] %>
         </div>
       <% end %>

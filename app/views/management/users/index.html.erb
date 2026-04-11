@@ -2,7 +2,7 @@
 
 <% content_for :header do %>
   <h1>Users</h1>
-  <%= link_to "New user", new_user_path %>
+  <%= link_to "New user", { action: :new } %>
 <% end %>
 
 <%= render "shared/paginated_table", records: @users, pagy: @pagy, columns: %i[avatar id name_id name email phone created_at updated_at] %>

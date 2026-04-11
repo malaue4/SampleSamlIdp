@@ -1,6 +1,6 @@
 <%# locals: (saml_metadatum:) -%>
 
-<%= bootstrap_form_with(model: saml_metadatum) do |form| %>
+<%= bootstrap_form_with(model: saml_metadatum, url: { action: saml_metadatum.new_record? ? :create : :update }) do |form| %>
   <%= form.alert_message t(".error", default: "Please fix the following errors:") %>
 
   <%= form.text_field :entity_id, label: "Entity ID" %>

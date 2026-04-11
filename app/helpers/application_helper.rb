@@ -1,6 +1,4 @@
 module ApplicationHelper
-  include Pagy::Frontend
-
   def link_label(link)
     case link
     in Class if link < ApplicationRecord

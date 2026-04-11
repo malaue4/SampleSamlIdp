@@ -27,11 +27,17 @@ gem "jbuilder"
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
 
-gem "cancancan", "~> 3.6"
-
 gem "bootstrap_form", "~> 5"
-
-gem "pagy", "~> 9.4"
+gem "cancancan", "~> 3.6"
+gem "chartkick", "~> 5.0"
+gem "faker", "~> 3.4"
+gem "groupdate", "~> 6.4"
+gem "ostruct", "~> 0.6.3"
+gem "pagy", "~> 43.0"
+gem "rouge", "~> 4.3"
+gem "rubystats", "~> 0.4.1"
+gem "xmldsig", "~> 0.7.0"
+gem "xmlenc", "~> 0.8.0"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -67,21 +73,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-
-gem "chartkick", "~> 5.0"
-
-gem "groupdate", "~> 6.4"
-
-gem "faker", "~> 3.4"
-
-gem "rubystats", "~> 0.4.1"
-
-gem "saml_idp"
-
-gem "rouge", "~> 4.3"
-
-gem "xmldsig", "~> 0.7.0"
-
-gem "ostruct", "~> 0.6.3"
-
-gem "xmlenc", "~> 0.8.0"

@@ -1,9 +1,3 @@
 # Optionally override some pagy default with your own in the pagy initializer
-Pagy::DEFAULT[:limit] = 25 # items per page
-Pagy::DEFAULT[:size]  = 9  # nav bar links
-
-# Better user experience handled automatically
-require "pagy/extras/overflow"
-Pagy::DEFAULT[:overflow] = :last_page
-
-require "pagy/extras/bootstrap"
+Pagy::OPTIONS[:limit] = 25 # items per page
+Pagy::OPTIONS[:size]  = 9  # nav bar links

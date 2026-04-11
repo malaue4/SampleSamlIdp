@@ -2,7 +2,7 @@
 
 module Saml
   module Dsig
-    class PGPData
+    class PgpData
       include ActiveModel::Model
       include ActiveModel::Attributes
       include LazyAttributes
@@ -37,6 +37,10 @@ module Saml
           builder.PGPKeyID pgp_key_id if pgp_key_id
           builder.PGPKeyPacket pgp_key_packet if pgp_key_packet
           other_elements.each { |el| builder << el.to_xml }
+        end
+
+        def xml_element_name
+          :PGPData
         end
     end
   end

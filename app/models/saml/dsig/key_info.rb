@@ -70,7 +70,7 @@ module Saml
           return [] unless key_info_element.present?
 
           key_info_element.xpath("ds:PGPData", ds: Namespaces::DS).map do |it|
-            ::Saml::Dsig::PGPData.parse(it)
+            ::Saml::Dsig::PgpData.parse(it)
           end
         end
 

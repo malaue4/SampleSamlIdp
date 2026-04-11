@@ -21,7 +21,7 @@ module Saml
     lazy_attribute(:id) { status_response_element&.[]("ID") }
     attribute :in_response_to, :string
     lazy_attribute(:in_response_to) { status_response_element&.[]("InResponseTo") }
-    attribute :version, :string
+    attribute :version, :string, default: "2.0"
     lazy_attribute(:version) { status_response_element&.[]("Version") }
     attribute :issue_instant, :datetime
     lazy_attribute(:issue_instant) { status_response_element&.[]("IssueInstant")&.to_datetime }

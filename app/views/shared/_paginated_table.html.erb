@@ -1,6 +1,7 @@
 <%# locals: (records:, pagy:, columns: nil) -%>
 <% columns ||= records %>
 <% record_model ||= records.model %>
+
 <div class="p-0">
   <table id="<%= record_model.model_name.route_key %>" class="table table-borderless table-striped m-0">
     <thead class="sticky-top">
@@ -50,6 +51,7 @@
     </tfoot>
   </table>
 </div>
+
 <% content_for :footer do %>
   <%== pagy.series_nav(:bootstrap, classes: "pagination m-0") %>
 <% end %>

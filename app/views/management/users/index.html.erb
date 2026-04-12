@@ -5,4 +5,4 @@
   <%= link_to "New user", { action: :new } %>
 <% end %>
 
-<%= render "shared/paginated_table", records: @users, pagy: @pagy, columns: %i[avatar id name_id name email phone created_at updated_at] %>
+<%= render "shared/paginated_table", records: @users, pagy: @pagy, columns: %i[avatar name email phone created_at updated_at] %>

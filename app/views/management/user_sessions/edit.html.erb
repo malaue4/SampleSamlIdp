@@ -1,12 +1,15 @@
 <% content_for :title, "Editing user session" %>
-
-<h1>Editing user session</h1>
+<% content_for :header do %>
+  <h1>Editing user session</h1>
+<% end %>
 
 <%= render "form", user_session: @user_session %>
 
 <br>
 
-<div>
-  <%= link_to "Show this user session", { action: :show } %> |
-  <%= link_to "Back to user sessions", { action: :index } %>
-</div>
+<% content_for :footer do %>
+  <div>
+    <%= link_to "Show this user session", { action: :show } %> |
+    <%= link_to "Back to user sessions", { action: :index } %>
+  </div>
+<% end %>

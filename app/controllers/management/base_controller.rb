@@ -2,6 +2,5 @@
 
 module Management
   class BaseController < ApplicationController
-
   end
 end

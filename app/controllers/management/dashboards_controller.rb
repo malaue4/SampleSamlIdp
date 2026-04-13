@@ -23,7 +23,7 @@ module Management
         start = date.at_beginning_of_quarter
         stop = date.at_end_of_quarter
         start..stop
-                   end
+      end
       pp time_range
       @user_sessions_chart_data = [
         {

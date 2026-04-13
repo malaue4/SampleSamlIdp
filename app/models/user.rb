@@ -4,6 +4,14 @@ class User < ApplicationRecord
     where(id: user.user_sessions.maximum(:id), expires_at: Time.current..)
   }, class_name: "UserSession"
 
+  store_accessor :notes, *[
+    :password,
+    :job,
+    :company,
+    :country,
+    :address
+  ], prefix: true
+
   validates :name_id, presence: true
 
   has_one_attached :avatar
@@ -12,7 +20,12 @@ class User < ApplicationRecord
   has_secure_password
 
   before_create do
-    self.notes ||= { password: }
+    self.password ||= Faker::Internet.password(min_length: 12, max_length: 24)
+    self.notes_password ||= password
+  end
+
+  before_validation on: :create do
+    self.name_id ||= SecureRandom.uuid
   end
 
   # Avatar variant definitions

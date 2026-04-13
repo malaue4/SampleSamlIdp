@@ -19,14 +19,14 @@ module Saml
 
     def test_parse
       assert_equal "https://disaster.area/please/clear", @name_id.value
-      assert_equal "bad", @name_id.format
+      assert_equal "bad", @name_id.name_id_format
     end
 
     def test_as_json
       assert_equal({
                      "attributes"=>{
                        "value"=>"https://disaster.area/please/clear",
-                       "format"=>"bad",
+                       "name_id_format"=>"bad",
                        "sp_provided_id"=>nil,
                        "name_qualifier"=>nil,
                        "sp_name_qualifier"=>nil

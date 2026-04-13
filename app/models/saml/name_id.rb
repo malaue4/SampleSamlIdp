@@ -6,16 +6,22 @@ module Saml
     include ActiveModel::Attributes
     include ToXml
 
-    attribute :value, default: ""
-    attribute :format, default: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
-    attribute :sp_provided_id, default: false
+    FORMATS = {
+      persistent: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      transient: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+      email_address: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+    }.freeze
+
+    attribute :value
+    attribute :name_id_format
+    attribute :sp_provided_id
     attribute :name_qualifier
     attribute :sp_name_qualifier
 
     def self.parse(name_id_element)
       new(
         value: name_id_element.text&.squish,
-        format: name_id_element["Format"],
+        name_id_format: name_id_element["Format"],
         sp_provided_id: name_id_element["SPProvidedID"],
         name_qualifier: name_id_element["NameQualifier"],
         sp_name_qualifier: name_id_element["SPNameQualifier"],
@@ -30,7 +36,7 @@ module Saml
 
       def xml_attributes
         {
-          Format: format,
+          Format: name_id_format,
           SPProvidedID: sp_provided_id,
           NameQualifier: name_qualifier,
           SPNameQualifier: sp_name_qualifier

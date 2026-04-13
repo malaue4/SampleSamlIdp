@@ -124,6 +124,23 @@ module Saml
         @idp_sso_descriptor ||= role_descriptors.find { |rd| rd.is_a?(IdentityProviderSingleSignOnDescriptor) }
       end
 
+      def authn_authority_descriptor
+        @authn_authority_descriptor ||= role_descriptors.find { |rd| rd.is_a?(AuthnAuthorityDescriptor) }
+      end
+
+      def attribute_authority_descriptor
+        @attribute_authority_descriptor ||= role_descriptors.find { |rd| rd.is_a?(AttributeAuthorityDescriptor) }
+      end
+
+      # @return [Nokogiri::XML::Node, nil]
+      def signature_element
+        @signature_element ||= request_element.at_xpath("ds:Signature", "ds" => Namespaces::DS)
+      end
+
+      def signed?
+        signature_element.present?
+      end
+
       private
 
         def xml_attributes

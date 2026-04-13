@@ -162,7 +162,7 @@ module Saml
     end
 
     def verify_signature(certificate = nil)
-      certificate ||= metadata.parsed_metadata.fetch(:signing_certificate)
+      certificate ||= metadata.parsed_metadata.signing_certificates.first
       certificate = OpenSSL::X509::Certificate.new(certificate) unless certificate.is_a? OpenSSL::X509::Certificate
       signed_document = Xmldsig::SignedDocument.new(raw_request)
       signed_document.validate(certificate)

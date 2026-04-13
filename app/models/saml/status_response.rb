@@ -33,9 +33,9 @@ module Saml
     attribute :issuer
     lazy_attribute(:issuer) { issuer_element.present? ? NameId.parse(issuer_element) : nil }
     attribute :signature
-    # TODO: Load signature from XML
+    lazy_attribute(:signature) { signature_element.present? ? Dsig::Signature.parse(signature_element) : nil }
     attribute :extensions
-    # TODO: Load extensions from XML
+    lazy_attribute(:extensions) { extensions_element.present? ? Extensions.parse(extensions_element) : nil }
     attribute :status
     lazy_attribute(:status) { status_element.present? ? Status.parse(status_element) : nil }
 
@@ -84,6 +84,14 @@ module Saml
       @status_element ||= status_response_element&.at_xpath("samlp:Status", "samlp" => Namespaces::SAMLP)
     end
 
+    def signature_element
+      @signature_element ||= status_response_element&.at_xpath("ds:Signature", "ds" => Namespaces::DS)
+    end
+
+    def extensions_element
+      @extensions_element ||= status_response_element&.at_xpath("samlp:Extensions", "samlp" => Namespaces::SAMLP)
+    end
+
     def status_response_element
       @status_response_element ||= document && document.at_xpath(RESPONSE_TYPES.map { |type| "/samlp:#{type}" }.join("|"), "samlp" => Namespaces::SAMLP)
     end
@@ -107,8 +115,8 @@ module Saml
 
       def xml_content(builder)
         issuer&.build_xml(builder, xml_element_name: "Issuer")
-        # signature&.build_xml(builder)
-        # extensions&.build_xml(builder)
+        signature&.build_xml(builder)
+        extensions&.build_xml(builder)
         status&.build_xml(builder)
       end
   end

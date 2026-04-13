@@ -302,12 +302,14 @@ module Saml
       end
 
       def encode_failure_response(idp_entity_id:, error:, saml_request_id: nil, destination:)
+        response_id = "_#{SecureRandom.uuid}"
         res = Saml::Response.new(
-          id: "_#{SecureRandom.uuid}",
+          id: response_id,
           issuer: NameId.new(value: idp_entity_id),
           in_response_to: saml_request_id,
           destination:,
-          issue_instant: Time.current.utc
+          issue_instant: Time.current.utc,
+          signature: Dsig::Signature.prepare_for_signing(response_id)
         )
         res.status = Saml::Status.new(
           status_code: StatusCode.new(
@@ -319,6 +321,7 @@ module Saml
 
         unsigned_xml = res.to_xml
 
+        # TODO: Use key from config
         secret_key = <<PRIVATE_KEY
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI6vkC3VAhWNgCAggA
@@ -341,90 +344,13 @@ PRIVATE_KEY
 
         signed_xml = if true # sign_response?
                        sd = Xmldsig::SignedDocument.new(unsigned_xml)
-                       signing_key = secret_key
-                       sd.sign(OpenSSL::PKey.read signing_key, "curse you perry the platypus")
+                       sd.sign(OpenSSL::PKey.read secret_key, "curse you perry the platypus")
                      else
                        unsigned_xml
                      end
 
         Base64.strict_encode64(signed_xml)
       end
-
-      def encode_failure_responsed(idp_entity_id:, error:, saml_request_id: nil, destination: saml_acs_url)
-        response_attributes = {}
-        response_attributes[:ID] = "_#{SecureRandom.uuid}"
-        response_attributes[:Version] = "2.0"
-        response_attributes[:IssueInstant] = Time.current.utc.iso8601
-        response_attributes[:Destination] = destination
-        response_attributes[:Consent] = Saml::XML::Namespaces::Consents::UNSPECIFIED
-        response_attributes[:InResponseTo] = saml_request_id unless saml_request_id.nil?
-        response_attributes["xmlns:samlp"] = Saml::XML::Namespaces::PROTOCOL
-
-        xml = Builder::XmlMarkup.new
-        xml.instruct! :xml, version: "1.0", encoding: "UTF-8"
-        xml.tag! :samlp, :Response, response_attributes do |res|
-          res.Issuer idp_entity_id, xmlns: "urn:oasis:names:tc:SAML:2.0:assertion"
-          build_signature_markup xml, response_attributes[:ID] if true # should sign response?
-          res.tag! :samlp, :Status do |status|
-            status.tag! :samlp, :StatusCode, Value: "urn:oasis:names:tc:SAML:2.0:status:Responder" do |code|
-              code.tag! :samlp, :StatusCode, Value: "urn:oasis:names:tc:SAML:2.0:status:AuthnFailed"
-            end
-            status.tag! :samlp, :StatusMessage, error
-          end
-        end
-
-        unsigned_xml = xml.target!
-
-        signed_xml = if true # sign_response?
-          sd = Xmldsig::SignedDocument.new(unsigned_xml)
-          signing_key = SamlIdp.config.secret_key
-          sd.sign(OpenSSL::PKey.read signing_key, "curse you perry the platypus")
-        else
-          unsigned_xml
-        end
-
-        Base64.strict_encode64(signed_xml)
-      end
-
-    SIGNATURE_ALGORITHMS = {
-      rsa_sha1: "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
-      rsa_sha256: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-      rsa_sha384: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384",
-      rsa_sha512: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512",
-      dsa_sha1: "http://www.w3.org/2000/09/xmldsig#dsa-sha1",
-      dsa_sha256: "http://www.w3.org/2009/xmldsig11#dsa-sha256"
-    }.freeze
-
-    # Builds an XML markup for a digital signature according to the XML DSig specification.
-    #
-    # This method constructs the XML structure required for signing data using
-    # a digital signature algorithm. It creates a "Signature" element containing
-    # "SignedInfo", "CanonicalizationMethod", "SignatureMethod", and "Reference" elements.
-    # The algorithm used for signing can be specified by the `signature_algorithm` parameter.
-    #
-    # Parameters:
-    # - xml: The Builder::XmlMarkup object used to generate XML.
-    # - reference_id: A unique identifier for the signature, inserted as the "Id" attribute of the "Signature" element.
-    # - signature_algorithm: A symbol representing the digital signature algorithm to use. Defaults to `:rsa_sha1`.
-    #
-    # Returns:
-    # - nil: XML markup is appended to the provided xml object, and no explicit value is returned.
-    def build_signature_markup(xml, reference_id, signature_algorithm: :rsa_sha1)
-      xml.ds :Signature, "xmlns:ds": "http://www.w3.org/2000/09/xmldsig#" do |sig|
-        sig.ds :SignedInfo do |signed_info|
-          signed_info.ds :CanonicalizationMethod, Algorithm: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-          signed_info.ds :SignatureMethod, Algorithm: SIGNATURE_ALGORITHMS.fetch(signature_algorithm)
-          signed_info.ds :Reference, URI: "##{reference_id}" do |reference|
-            reference.ds :Transforms do |transforms|
-              transforms.ds :Transform, Algorithm: "http://www.w3.org/2000/09/xmldsig#enveloped-signature"
-            end
-            reference.ds :DigestMethod, Algorithm: "http://www.w3.org/2001/04/xmlenc#sha256"
-            reference.ds :DigestValue
-          end
-        end
-        sig.ds :SignatureValue
-      end
-    end
 
       def require_saml_request
         @saml_request = Request.parse(params.require(:SAMLRequest))

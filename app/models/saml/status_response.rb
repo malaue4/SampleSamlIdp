@@ -67,13 +67,13 @@ module Saml
 
 
 
-    def initialize(raw_xml:, **attributes)
+    def initialize(raw_xml: nil, **attributes)
       super(attributes)
       @raw_xml = raw_xml
     end
 
     def document
-      @document ||= Nokogiri::XML(raw_xml)
+      @document ||= raw_xml && Nokogiri::XML(raw_xml)
     end
 
     def issuer_element
@@ -85,7 +85,7 @@ module Saml
     end
 
     def status_response_element
-      @status_response_element ||= document.at_xpath(RESPONSE_TYPES.map { |type| "/samlp:#{type}" }.join("|"), "samlp" => Namespaces::SAMLP)
+      @status_response_element ||= document && document.at_xpath(RESPONSE_TYPES.map { |type| "/samlp:#{type}" }.join("|"), "samlp" => Namespaces::SAMLP)
     end
 
     private
@@ -95,7 +95,7 @@ module Saml
           ID: id,
           InResponseTo: in_response_to,
           Version: version,
-          IssueInstant: issue_instant,
+          IssueInstant: issue_instant.xmlschema,
           Destination: destination,
           Consent: consent,
           ).compact
@@ -106,7 +106,7 @@ module Saml
       end
 
       def xml_content(builder)
-        issuer&.build_xml(builder)
+        issuer&.build_xml(builder, xml_element_name: "Issuer")
         # signature&.build_xml(builder)
         # extensions&.build_xml(builder)
         status&.build_xml(builder)

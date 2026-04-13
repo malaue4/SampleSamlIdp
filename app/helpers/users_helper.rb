@@ -1,6 +1,6 @@
 module UsersHelper
   def user_avatar(user, size: 32, css_class: "")
-    if user.avatar.attached?
+    if user.persisted? && user.avatar.attached?
       variant = case size
       when 0..100 then user.avatar_thumb
       else user.avatar_medium

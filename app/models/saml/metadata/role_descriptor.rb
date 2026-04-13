@@ -53,8 +53,10 @@ module Saml
         @role_descriptor_element = role_descriptor_element
       end
 
-      def signing_certificate
-        key_descriptors.find { |k| k.use == "signing" }.certificate
+      def signing_certificates
+        key_descriptors
+          .filter { |k| k.use == "signing" || k.use == nil }
+          .map(&:certificate)
       end
 
       private

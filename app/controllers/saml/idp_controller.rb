@@ -268,7 +268,7 @@ module Saml
 
     def idp_make_saml_failure_response(error: "Something went wrong")
       # NOTE encryption is optional
-      encode_failure_response idp_entity_id: SamlIdp.config.entity_id,
+      encode_failure_response idp_entity_id: "SamlIdp.config.entity_id",
                               error:,
                               saml_request_id: saml_request&.id,
                               destination: service_provider.assertion_consumer_service_url
@@ -301,7 +301,56 @@ module Saml
         false
       end
 
-      def encode_failure_response(idp_entity_id:, error:, saml_request_id: nil, destination: saml_acs_url)
+      def encode_failure_response(idp_entity_id:, error:, saml_request_id: nil, destination:)
+        res = Saml::Response.new(
+          id: "_#{SecureRandom.uuid}",
+          issuer: NameId.new(value: idp_entity_id),
+          in_response_to: saml_request_id,
+          destination:,
+          issue_instant: Time.current.utc
+        )
+        res.status = Saml::Status.new(
+          status_code: StatusCode.new(
+            value: StatusCode::RESPONDER,
+            status_code: StatusCode.new(value: StatusCode::AUTHN_FAILED)
+          ),
+          status_message: error
+        )
+
+        unsigned_xml = res.to_xml
+
+        secret_key = <<PRIVATE_KEY
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI6vkC3VAhWNgCAggA
+MBQGCCqGSIb3DQMHBAj/WQPqWauSpwSCAoADIhBhKM9xHZpyR8ZWQZZOJk7HQjx/
+6NV5qETOvwEljEagjg5PvTMBEq4BWowGWzEQpk8x4oMwJmeGzf1VITU4bd2cAtP6
+Nri5Wj6SgyLm7eQTiThTldwF/tYcQ37CHS1rTBo96IXGVRyamdtP9t6hXQEFDmPj
+P34V3OFS01O1cJur2/DHjV9g6KjQl3A/RlBoK04SinClecAxaFkbhvhg73Qvrss4
+ITfrj4F/ECIBBS0mNvBkJWQQaielqHU02pG3d4eLpIs8TXBKd2/FDC26xYX3foyf
+/3U0BgTHVG5IHpEvn1T8kvM7oogkeLenblCFAd6DdRXeGncQJe00CiTLlQ3RSoYF
+XEXEd4FzINkwHH9lw4JAQVgSnpKppWDmxatMifTbiHhnRESP2lNOqm8RqKWBgl6i
+h8lUg0q3/dIHuWZx30BWYSNWBsajz7zFJnEKW+URWNSL1EFh88wKn+LbazNDIQKo
+Dt6MS4AVPzR5QTpGRxgLp9zmfjFLnGywuc+5wKFlMPqtSYCb9qQExkjb3EoqxW0x
+vF55rAVS9I6Nt7WeCqflR4JPY6zIxOeGwjibP+xAH30VgZaOLXTEzBAwCM504h9W
+SPmlY37fxbRcTaxJhqvwWdJvp7lUzPSKOlR0ZK63ygLToH2fcqVsw93M9JEWodLL
+WuLPhHbq2xx6e412v8vsY1pGisq3Kxww3gCE2bja9eyXWef9vxjV+eZk2/g/QZY2
+pnOJmUVJgKvGQscTcgAjIzwanIWO30di+9UoRJSYcyOTypz2kFIUq2m7E68kgKlu
+RCKiK7RiS7Nb+NerUoYBZuZwRcoSLCG8460TViO0y/UoTbgbIXJuk/Yk
+-----END ENCRYPTED PRIVATE KEY-----
+PRIVATE_KEY
+
+        signed_xml = if true # sign_response?
+                       sd = Xmldsig::SignedDocument.new(unsigned_xml)
+                       signing_key = secret_key
+                       sd.sign(OpenSSL::PKey.read signing_key, "curse you perry the platypus")
+                     else
+                       unsigned_xml
+                     end
+
+        Base64.strict_encode64(signed_xml)
+      end
+
+      def encode_failure_responsed(idp_entity_id:, error:, saml_request_id: nil, destination: saml_acs_url)
         response_attributes = {}
         response_attributes[:ID] = "_#{SecureRandom.uuid}"
         response_attributes[:Version] = "2.0"

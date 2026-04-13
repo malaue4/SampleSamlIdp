@@ -6,16 +6,88 @@
   <table id="<%= record_model.model_name.route_key %>" class="table table-borderless table-striped m-0">
     <thead class="sticky-top">
     <% if @filter %>
-      <tr>
+      <tr data-controller="filter" data-filter-param-key="<%= @filter.model_name.param_key %>">
         <th colspan="<%= columns.size + 1 %>">
-          <%= bootstrap_form_for(@filter, url: "", method: :get, layout: :inline) do |f| %>
-            <% @filter.fields.each do |name, options| %>
-              <% options => type:, **field_options %>
-              <%= f.public_send type, name, **field_options.reverse_merge(floating: true, placeholder: "l") %>
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <%
+              # Unified filter rendering for both single fields and range attributes
+              filters_to_render = []
+
+              @filter.fields.each do |name, options|
+                next if @filter.range_attribute?(name)
+                filters_to_render << {
+                  name: name,
+                  label: @filter.class.human_attribute_name(name),
+                  value: @filter.public_send(name),
+                  fields: [name]
+                }
+              end
+
+              @filter.range_attributes.each do |name, range1, range2|
+                after = @filter.public_send(range1)
+                before = @filter.public_send(range2)
+                value = [after, before].compact_blank.join(" - ") if after.present? || before.present?
+                filters_to_render << {
+                  name: name,
+                  label: @filter.class.human_attribute_name(name),
+                  value: value,
+                  fields: [range1, range2]
+                }
+              end
+            %>
+
+            <% filters_to_render.each do |filter_data| %>
+              <% name = filter_data[:name] %>
+              <% value = filter_data[:value] %>
+
+              <% if value.present? %>
+                <div class="badge rounded-pill bg-primary text-white d-flex align-items-center gap-1 p-2"
+                     style="cursor: pointer;"
+                     data-bs-toggle="popover"
+                     data-bs-html="true"
+                     data-bs-content-id="filter-content-<%= name %>"
+                     data-action="click->filter#togglePopover"
+                     data-filter-name="<%= name %>">
+                  <%= filter_data[:label] %>: <%= value %>
+                  <button type="button"
+                          class="btn-close btn-close-white extra-small"
+                          aria-label="Clear"
+                          style="font-size: 0.5rem;"
+                          data-action="click->filter#clear"
+                          data-filter-name="<%= name %>"></button>
+                </div>
+              <% else %>
+                <div class="badge rounded-pill border border-primary text-primary p-2"
+                     style="cursor: pointer; border-style: dashed !important;"
+                     data-bs-toggle="popover"
+                     data-bs-html="true"
+                     data-bs-content-id="filter-content-<%= name %>"
+                     data-action="click->filter#togglePopover"
+                     data-filter-name="<%= name %>">
+                  <i class="bi bi-plus-lg me-1"></i>
+                  <%= filter_data[:label] %>
+                </div>
+              <% end %>
+
+              <template id="filter-content-<%= name %>">
+                <%= bootstrap_form_for(@filter, url: "", method: :get, layout: :vertical, html: { data: { controller: "filter-form", action: "submit->filter-form#submit" } }) do |f| %>
+                  <% filter_data[:fields].each do |field_name| %>
+                    <% field_options = @filter.fields[field_name.to_s] %>
+                    <% next unless field_options %>
+                    <%= f.public_send field_options[:type], field_name, **field_options.except(:type).reverse_merge(floating: true, placeholder: "l", control_class: "form-control form-control-sm") %>
+                  <% end %>
+                  <div class="d-grid mt-2">
+                    <%= f.primary "Apply", class: "btn btn-primary btn-sm" %>
+                  </div>
+                <% end %>
+              </template>
             <% end %>
-            <button type="reset" class="btn btn-danger"><i class="bi-x-lg"></i></button>
-            <%= f.primary { tag.i(nil, class: "bi bi-search") } %>
-          <% end %>
+
+            <% if @filter.attributes.values.any?(&:present?) %>
+              <%= link_to "Clear all", url_for(@filter.model_name.param_key => nil), class: "btn btn-link btn-sm text-decoration-none" %>
+            <% end %>
+          </div>
+
         </th>
       </tr>
     <% end %>

@@ -39,13 +39,13 @@ class Filter
     end
   end
 
-  private
-
   def range_attribute?(name)
     range_attributes.any? do |_base, after, before|
       name.to_s == after.to_s || name.to_s == before.to_s
     end
   end
+
+  private
 
   def attribute_type(name)
     type = self.class.type_for_attribute(name).type || :string

@@ -122,6 +122,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
+    docile (1.4.1)
     drb (2.2.3)
     erb (6.0.2)
     erubi (1.13.1)
@@ -324,6 +325,12 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.2)
+    simplecov_json_formatter (0.1.4)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -407,6 +414,7 @@ DEPENDENCIES
   ruby-vips (~> 2.3)
   rubystats (~> 0.4.1)
   selenium-webdriver
+  simplecov
   sprockets-rails
   stimulus-rails
   turbo-rails

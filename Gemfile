@@ -61,6 +61,7 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 
   gem "minitest-rails"
+  gem "simplecov"
 end
 
 group :development do

@@ -15,6 +15,12 @@ module Management
 
     # GET /users/new
     def new
+      @user.name ||= Faker::Name.name
+      @user.email ||= Faker::Internet.email(name: @user.name)
+      @user.username ||= Faker::Internet.username(specifier: @user.name)
+      @user.password ||= Faker::Internet.password(min_length: 8, max_length: 20)
+      @user.phone ||= Faker::PhoneNumber.cell_phone
+      @user.name_id ||= SecureRandom.uuid
     end
 
     # GET /users/1/edit

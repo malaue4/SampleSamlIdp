@@ -28,6 +28,14 @@ class User < ApplicationRecord
     self.name_id ||= SecureRandom.uuid
   end
 
+  after_create do
+    next if avatar.attached?
+
+    avatar_url = Faker::Avatar.image(slug: username, size: "300x300", format: "png", set: "any", bgset: "any")
+    avatar_io = URI.open(avatar_url)
+    avatar.attach(io: avatar_io, filename: "avatar.png", content_type: "image/png")
+  end
+
   # Avatar variant definitions
   def avatar_thumb
     avatar.variant(resize_to_fill: [ 100, 100 ]) if avatar.attached?

@@ -74,9 +74,7 @@ module Management
           :username,
           :email,
           :phone,
-          :password,
-          :password_confirmation,
-          :password_challenge
+          :password
         )
       end
   end

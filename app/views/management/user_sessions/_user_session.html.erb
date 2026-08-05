@@ -9,6 +9,14 @@
           </td>
         </tr>
         <tr>
+          <th class="ps-0 text-muted">IP address</th>
+          <td class="font-monospace"><%= user_session.ip_address %></td>
+        </tr>
+        <tr>
+          <th class="ps-0 text-muted">User agent</th>
+          <td><%= user_session.user_agent %></td>
+        </tr>
+        <tr>
           <th class="ps-0 text-muted">Expires at</th>
           <td><%= user_session.expires_at.to_fs(:long) %></td>
         </tr>

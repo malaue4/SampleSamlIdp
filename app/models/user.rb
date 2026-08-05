@@ -12,6 +12,9 @@ class User < ApplicationRecord
     :address
   ], prefix: true
 
+  normalizes :username, with: ->(e) { e.strip.downcase }
+  normalizes :email_address, with: ->(e) { e.strip.downcase }
+
   validates :name_id, presence: true
 
   has_one_attached :avatar

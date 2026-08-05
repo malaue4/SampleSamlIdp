@@ -2,5 +2,6 @@
 
 module Management
   class BaseController < ApplicationController
+    layout "management"
   end
 end

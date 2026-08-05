@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  organization: one
+  contact_type: technical
+  given_name: Drac
+  sur_name: Ulysses Law
+  email_addresses:
+    - technical@sampleidp.localhost
+  telephone_numbers:
+    - 4512345678
+
+two:
+  organization: one
+  contact_type: support
+  given_name: Frank
+  sur_name: Einstein
+  email_addresses:
+    - support@sampleidp.localhost
+  telephone_numbers:
+    - 4512123123

@@ -1,0 +1,39 @@
+<div id="<%= dom_id site %>">
+  <dl class="row">
+    <dt class="col-sm-3">Entity ID</dt>
+    <dd class="col-sm-9"><code><%= site.entity_id %></code></dd>
+
+    <dt class="col-sm-3">Extra Settings</dt>
+    <dd class="col-sm-9">
+      <% if site.extra_settings.present? %>
+        <pre class="bg-light p-2 border"><code><%= JSON.pretty_generate(site.extra_settings) %></code></pre>
+      <% else %>
+        <span class="text-muted">None</span>
+      <% end %>
+    </dd>
+
+    <dt class="col-sm-3">Signing Certificates</dt>
+    <dd class="col-sm-9">
+      <% if site.signing_certificates.present? %>
+        <% site.signing_certificates.each do |cert| %>
+          <%= render "certificate_visualizer", cert_info: saml_certificate_info(cert) %>
+        <% end %>
+      <% else %>
+        <span class="text-muted">None</span>
+      <% end %>
+    </dd>
+
+    <dt class="col-sm-3">Encryption Certificates</dt>
+    <dd class="col-sm-9">
+      <% if site.encryption_certificates.present? %>
+        <% site.encryption_certificates.each do |cert| %>
+          <%= render "certificate_visualizer", cert_info: saml_certificate_info(cert) %>
+        <% end %>
+      <% else %>
+        <span class="text-muted">None</span>
+      <% end %>
+    </dd>
+  </dl>
+
+<%= debug site.generate_metadata.as_json  %>
+</div>

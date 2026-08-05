@@ -1,0 +1,72 @@
+<%# locals: (cert_info:) -%>
+<% return if cert_info.blank? %>
+
+<% @prefix ||= 0 %>
+<% @prefix += 1 %>
+
+<div class="accordion mb-3" id="<%= "#{@prefix}-#{cert_info[:fingerprint]}" %>">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#<%= "#{@prefix}-#{cert_info[:fingerprint]}-details" %>" aria-expanded="true" aria-controls="<%= "#{@prefix}-#{cert_info[:fingerprint]}-details" %>">
+        <span class="badge <%= status_badge_class(cert_info[:status]) %> me-2">
+          <%= cert_info[:status].to_s.humanize.upcase %>
+        </span>
+        <span>Certificate Detail</span>
+      </button>
+    </h2>
+    <div id="<%= "#{@prefix}-#{cert_info[:fingerprint]}-details" %>" class="accordion-collapse collapse show" data-bs-parent="#<%= "#{@prefix}-#{cert_info[:fingerprint]}" %>">
+      <div class="accordion-body">
+        <% if cert_info[:status] == :expiring_soon %>
+          <div class="alert alert-warning py-2 mb-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Warning:</strong> This certificate expires in <%= distance_of_time_in_words(Time.current, cert_info[:not_after]) %>. SAML logins will fail soon.
+          </div>
+        <% elsif cert_info[:status] == :expired %>
+          <div class="alert alert-danger py-2 mb-3">
+            <i class="bi bi-x-circle-fill me-2"></i>
+            <strong>Critical:</strong> This certificate has expired. SAML logins are likely failing.
+          </div>
+        <% end %>
+        <div class="row g-2">
+          <div class="col-md-4 text-muted small uppercase">Issued To:</div>
+          <div class="col-md-8 fw-semibold"><%= cert_info[:subject] %></div>
+
+          <div class="col-md-4 text-muted small uppercase">Expires:</div>
+          <div class="col-md-8">
+            <%= cert_info[:not_after].strftime("%b %d, %Y") %>
+            <span class="text-muted small ms-1">(<%= relative_time_in_words(cert_info[:not_after], include_seconds: false) %>)</span>
+          </div>
+
+          <div class="col-md-4 text-muted small uppercase">Fingerprint:</div>
+          <div class="col-md-8">
+            <div class="hstack">
+              <%= tag.code(cert_info[:fingerprint], class: "text-truncate") %>
+              <button class="btn btn-link btn-sm p-0 ms-2"
+                      onclick="navigator.clipboard.writeText('<%= cert_info[:fingerprint] %>'); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000)">
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#<%= "#{@prefix}-#{cert_info[:fingerprint]}-raw" %>" aria-expanded="false" aria-controls="<%= "#{@prefix}-#{cert_info[:fingerprint]}-raw" %>">
+        Raw Certificate
+      </button>
+    </h2>
+    <div id="<%= "#{@prefix}-#{cert_info[:fingerprint]}-raw" %>" class="accordion-collapse collapse" data-bs-parent="#<%= "#{@prefix}-#{cert_info[:fingerprint]}" %>">
+      <div class="accordion-body">
+        <div class="position-relative">
+          <pre class="bg-light p-3 border rounded small mb-0" style="max-height: 200px; overflow-y: auto;"><code><%= cert_info[:raw] %></code></pre>
+          <button class="btn btn-sm btn-secondary position-absolute top-0 end-0 m-2"
+                  onclick="navigator.clipboard.writeText('<%= j cert_info[:raw] %>'); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy Raw', 2000)">
+            Copy Raw
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

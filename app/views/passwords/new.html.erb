@@ -1,0 +1,8 @@
+<h1>Forgot your password?</h1>
+
+<%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+
+<%= bootstrap_form_with url: { action: :create } do |form| %>
+  <%= form.email_field :username, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your username", value: params[:username] %><br>
+  <%= form.submit "Email reset instructions" %>
+<% end %>

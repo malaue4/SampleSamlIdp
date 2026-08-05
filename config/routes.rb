@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
+  resource :session
+  resources :passwords, param: :token
+
   namespace :management do
+    resource :site
     resources :saml_metadata
     resource :dashboard, only: :show
     resources :user_sessions
@@ -22,11 +26,34 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   namespace :saml do
+    resource :metadata, only: :show
+    get "metadata"
+    namespace :sp do # When acting as Service Provider
+      get "acs"
+      post "acs"
+      get "slo"
+      post "slo"
+    end
+    namespace :idp do # When acting as Identity Provider
+      get "sso"
+      post "sso"
+      get "slo"
+      post "slo"
+    end
+    namespace :authn_authority do # When acting as Authn Authority
+      resource :query, only: :create   # AuthnQuery endpoint
+    end
+    namespace :attribute_authority do # When acting as Attribute Authority
+      resource :query, only: :create   # AttributeQuery endpoint
+    end
+  end
+
+  namespace :saml do
     get "metadata" => "idp#show"
     get "metadata2" => "idp#metadata"
     get "auth" => "idp#new"
     post "auth" => "idp#create"
-    match "logout" => "idp#logout", via: [ :get, :post, :delete ]
+    match "logout" => "idp#logout", via: %i[get post delete]
     get "attributes" => "idp#attributes"
   end
 

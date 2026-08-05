@@ -3,6 +3,7 @@ ENV["RAILS_ENV"] ||= "test"
 # ENV["MT_NO_EXPECTATIONS"] = "true"
 require_relative "../config/environment"
 require "rails/test_help"
+require_relative "test_helpers/session_test_helper"
 require "minitest/rails"
 
 module ActiveSupport

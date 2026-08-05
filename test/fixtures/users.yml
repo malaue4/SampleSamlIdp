@@ -1,0 +1,17 @@
+<% password_digest = BCrypt::Password.create("password") %>
+
+one:
+  username: one
+  password_digest: <%= password_digest %>
+  name: <%= Faker::FunnyName.name %>
+  email: <%= Faker::Internet.email %>
+  phone: <%= Faker::PhoneNumber.cell_phone_in_e164 %>
+  notes: {}
+
+two:
+  username: two
+  password_digest: <%= password_digest %>
+  name: <%= Faker::FunnyName.name %>
+  email: <%= Faker::Internet.email %>
+  phone: <%= Faker::PhoneNumber.cell_phone_in_e164 %>
+  notes: {}

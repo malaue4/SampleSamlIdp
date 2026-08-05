@@ -1,0 +1,105 @@
+<%# locals: (site:) -%>
+
+<%= bootstrap_form_with(model: site, url: { action: site.new_record? ? :create : :update }) do |form| %>
+  <%= form.alert_message t(".error", default: "Please fix the following errors:") %>
+
+  <%= form.text_field :entity_id, help: "The unique identifier for this SAML Identity Provider." %>
+
+  <%= field_set_tag :organization do %>
+    <%= form.text_field :organization_name %>
+    <%= form.text_field :organization_display_name %>
+    <%= form.text_field :organization_url %>
+  <% end %>
+
+  <%# Signing Certificates %>
+  <%= form.hidden_field :signing_certificates, value: "", multiple: true %>
+  <div data-controller="cert-list" class="mb-3">
+    <h5>Signing Certificates</h5>
+    <div data-cert-list-target="list">
+      <% (site.signing_certificates.presence || [""]).each_with_index do |cert, i| %>
+        <div class="card mb-2" data-cert-entry data-controller="cert-parser">
+          <div class="card-body border rounded p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="mb-0">Signing Certificate <%= i + 1 %></h6>
+              <button class="btn btn-sm btn-outline-danger" data-action="cert-list#remove">Remove</button>
+            </div>
+            <p class="text-muted small">Drag and drop a .crt or .pem file here.</p>
+            <%= form.text_area :signing_certificates,
+                               value: cert,
+                               multiple: true,
+                               rows: 3,
+                               help: "PEM encoded signing certificate.",
+                               data: { cert_parser_target: "input" } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <template data-cert-list-target="template">
+      <div class="card mb-2" data-cert-entry data-controller="cert-parser">
+        <div class="card-body border rounded p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0" data-cert-index>Signing Certificate %{count}</h6>
+            <button class="btn btn-sm btn-outline-danger" data-action="cert-list#remove">Remove</button>
+          </div>
+          <p class="text-muted small">Drag and drop a .crt or .pem file here.</p>
+          <%= form.text_area :signing_certificates,
+                             multiple: true,
+                             rows: 3,
+                             help: "PEM encoded signing certificate.",
+                             data: { cert_parser_target: "input" } %>
+        </div>
+      </div>
+    </template>
+
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="cert-list#add">+ Add Signing Certificate</button>
+  </div>
+
+  <%# Encryption Certificates %>
+  <%= form.hidden_field :encryption_certificates, value: "", multiple: true %>
+  <div data-controller="cert-list" class="mb-3">
+    <h5>Encryption Certificates</h5>
+    <div data-cert-list-target="list">
+      <% (site.encryption_certificates.presence || [""]).each_with_index do |cert, i| %>
+        <div class="card mb-2" data-cert-entry data-controller="cert-parser">
+          <div class="card-body border rounded p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="mb-0">Encryption Certificate <%= i + 1 %></h6>
+              <button class="btn btn-sm btn-outline-danger" data-action="cert-list#remove">Remove</button>
+            </div>
+            <p class="text-muted small">Drag and drop a .crt or .pem file here.</p>
+            <%= form.text_area :encryption_certificates,
+                               value: cert,
+                               multiple: true,
+                               rows: 3,
+                               help: "PEM encoded encryption certificate.",
+                               data: { cert_parser_target: "input" } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <template data-cert-list-target="template">
+      <div class="card mb-2" data-cert-entry data-controller="cert-parser">
+        <div class="card-body border rounded p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0" data-cert-index>Encryption Certificate %{count}</h6>
+            <button class="btn btn-sm btn-outline-danger" data-action="cert-list#remove">Remove</button>
+          </div>
+          <p class="text-muted small">Drag and drop a .crt or .pem file here.</p>
+          <%= form.text_area :encryption_certificates,
+                             multiple: true,
+                             rows: 3,
+                             help: "PEM encoded encryption certificate.",
+                             data: { cert_parser_target: "input" } %>
+        </div>
+      </div>
+    </template>
+
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="cert-list#add">+ Add Encryption Certificate</button>
+  </div>
+
+  <div class="mt-3">
+    <%= form.primary "Save Settings" %>
+  </div>
+<% end %>

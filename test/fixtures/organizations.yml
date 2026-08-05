@@ -1,0 +1,10 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  site: one
+  name:
+    en: Sample Organization
+  display_name:
+    en: The Sample Organization
+  url:
+    en: http://sampleidp.localhost

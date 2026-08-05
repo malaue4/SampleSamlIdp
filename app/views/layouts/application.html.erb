@@ -17,47 +17,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="d-grid vh-100 bg-body-secondary" style="grid-template-columns: 16rem 1fr; grid-template-rows: 100%">
-    <nav class="bg-body-tertiary border-end d-flex flex-column">
-      <ul class="nav nav-underline vstack px-3 flex-grow-1">
-        <% [:dashboard, User, UserSession, SamlMetadatum].each do |link| %>
-          <li class="nav-item">
-            <%= link_to link_label(link),
-                        [:management, link],
-              class: {
-                "nav-link" => true,
-                "active" => request.fullpath.starts_with?(url_for([:management, link]))
-              } %>
-          </li>
-        <% end %>
-      </ul>
-
-      <% if current_user %>
-        <div class="mt-auto p-3 border-top">
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <%= user_avatar(current_user, size: 32) %>
-            <div class="overflow-hidden">
-              <div class="text-truncate fw-bold small"><%= current_user.name || current_user.username %></div>
-              <div class="text-truncate text-muted extra-small" style="font-size: 0.75rem;"><%= current_user.email %></div>
-            </div>
-          </div>
-          <%= link_to "My Account", management_account_path, class: [
-            "btn btn-sm w-100",
-            request.fullpath.starts_with?(management_account_path) ? "btn-primary" : "btn-outline-primary"
-          ] %>
-        </div>
-      <% end %>
-    </nav>
-    <main class="container-md container-fluid bg-body border-start border-end d-grid" style="grid-template-rows: auto 1fr auto;">
-      <header class="row border-bottom bg-body-tertiary p-3">
-        <%= content_for :header %>
-      </header>
-      <div class="row overflow-y-auto">
-        <%= yield %>
-      </div>
-      <footer class="row border-top bg-body-tertiary p-3 <%= "d-none" unless content_for? :footer %>">
-        <%= content_for :footer %>
-      </footer>
-    </main>
+  <body>
+    <%= yield %>
   </body>
 </html>

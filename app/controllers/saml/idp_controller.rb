@@ -7,7 +7,7 @@ module Saml
     attr_reader :saml_request
 
     before_action :require_saml_request, only: [ :new, :create, :logout ]
-    skip_before_action :authenticate_user!
+    allow_unauthenticated_access
 
     def new
       @metadata = SamlMetadatum.find_by entity_id: saml_request&.issuer_entity_id

@@ -36,27 +36,27 @@ module Saml
         assert_equal "info1", signature.signed_info.id
         assert_equal "http://www.w3.org/2001/10/xml-exc-c14n#", signature.signed_info.canonicalization_method
         assert_equal "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", signature.signed_info.signature_method
-        
+
         assert_equal 1, signature.signed_info.references.size
         ref = signature.signed_info.references.first
         assert_equal "#_123", ref.uri
         assert_equal "http://www.w3.org/2001/04/xmlenc#sha256", ref.digest_method
         assert_equal "dGhpcyBpcyBhIGRpZ2VzdA==", ref.digest_value
-        
+
         assert_equal 2, ref.transforms.size
         assert_equal "http://www.w3.org/2000/09/xmldsig#enveloped-signature", ref.transforms.first.algorithm
-        
+
         assert_not_nil signature.key_info
-        assert_equal ["Test Key"], signature.key_info.key_names
+        assert_equal [ "Test Key" ], signature.key_info.key_names
       end
 
       test "build_xml round-trip" do
         element = Nokogiri::XML(SAMPLE_XML).root
         signature = Signature.parse(element)
-        
+
         xml = signature.to_xml
         doc = Nokogiri::XML(xml)
-        
+
         assert_equal "sig1", doc.root["Id"]
         assert_equal "c2lnbmF0dXJlIHZhbHVl", doc.at_xpath("//ds:SignatureValue", ds: Namespaces::DS).text
         assert_equal "http://www.w3.org/2001/10/xml-exc-c14n#", doc.at_xpath("//ds:CanonicalizationMethod", ds: Namespaces::DS)["Algorithm"]
@@ -69,24 +69,24 @@ module Saml
         transform = Transform.new(algorithm: "http://www.w3.org/2001/10/xml-exc-c14n#")
         reference = Reference.new(
           uri: "#_456",
-          transforms: [transform],
+          transforms: [ transform ],
           digest_method: "http://www.w3.org/2001/04/xmlenc#sha256",
           digest_value: "YWJj"
         )
         signed_info = SignedInfo.new(
           canonicalization_method: "http://www.w3.org/2001/10/xml-exc-c14n#",
           signature_method: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-          references: [reference]
+          references: [ reference ]
         )
         signature = Signature.new(
           id: "sig2",
           signed_info: signed_info,
           signature_value: "eHl6"
         )
-        
+
         xml = signature.to_xml
         doc = Nokogiri::XML(xml)
-        
+
         assert_equal "Signature", doc.root.name
         assert_equal "sig2", doc.root["Id"]
         assert_equal "eHl6", doc.at_xpath("//ds:SignatureValue", ds: Namespaces::DS).text

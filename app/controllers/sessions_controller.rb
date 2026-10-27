@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
   def create
     auth_params = {
       username: params[:username],
-      password: params[:password],
+      password: params[:password]
     }
     if user = User.authenticate_by(auth_params)
       start_new_session_for user

@@ -39,11 +39,11 @@ module Saml
           instance.signed_info = SignedInfo.new(
             canonicalization_method: "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
             signature_method: SIGNATURE_ALGORITHMS.fetch(signature_algorithm),
-            references: [Reference.new(uri: "##{reference_uri}").tap do |it|
-              it.transforms = [Transform.enveloped_signature]
+            references: [ Reference.new(uri: "##{reference_uri}").tap do |it|
+              it.transforms = [ Transform.enveloped_signature ]
               it.digest_method = "http://www.w3.org/2001/04/xmlenc#sha256"
               it.digest_value = ""
-            end])
+            end ])
           instance.signature_value = ""
         end
       end

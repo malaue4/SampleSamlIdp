@@ -53,7 +53,7 @@ XML
       assert_not_nil response.signature
       assert_equal "sig1", response.signature.id
       assert_equal "eHl6", response.signature.signature_value
-      
+
       assert_not_nil response.extensions
       assert_match /foo:bar/, response.extensions.content
       assert_match /baz/, response.extensions.content
@@ -71,24 +71,24 @@ XML
 
       xml = response.to_xml
       document = Nokogiri::XML(xml)
-      
+
       assert_equal "Response", document.root.name
       assert_equal "_789", document.root["ID"]
       assert_equal "http://idp.example.com", document.at_xpath("//saml:Issuer", saml: Namespaces::SAML).text
       assert_equal "urn:oasis:names:tc:SAML:2.0:status:Success", document.at_xpath("//samlp:StatusCode", samlp: Namespaces::SAMLP)["Value"]
     end
-    
+
     test "build_xml with signature and extensions" do
       issuer = NameId.new(value: "http://idp.example.com")
       status = Status.new(status_code: StatusCode.new(value: "urn:oasis:names:tc:SAML:2.0:status:Success"))
-      
+
       # Mocking signature and extensions for build_xml test
       sig_node = Nokogiri::XML("<ds:Signature xmlns:ds='#{Namespaces::DS}' Id='sig2'><ds:SignatureValue>sigval</ds:SignatureValue></ds:Signature>").root
       signature = Dsig::Signature.parse(sig_node)
-      
+
       ext_node = Nokogiri::XML("<samlp:Extensions xmlns:samlp='#{Namespaces::SAMLP}'><my:Ext xmlns:my='urn:my'>val</my:Ext></samlp:Extensions>").root
       extensions = Extensions.parse(ext_node)
-      
+
       response = Response.new(
         id: "_101",
         issue_instant: Time.parse("2024-07-01T12:00:00Z"),
@@ -100,7 +100,7 @@ XML
 
       xml = response.to_xml
       document = Nokogiri::XML(xml)
-      
+
       assert_equal "sig2", document.at_xpath("//ds:Signature", ds: Namespaces::DS)["Id"]
       assert_equal "sigval", document.at_xpath("//ds:SignatureValue", ds: Namespaces::DS).text
       assert_not_nil document.at_xpath("//samlp:Extensions", samlp: Namespaces::SAMLP)

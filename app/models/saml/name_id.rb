@@ -9,7 +9,7 @@ module Saml
     FORMATS = {
       persistent: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
       transient: "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
-      email_address: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+      email_address: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
     }.freeze
 
     attribute :value

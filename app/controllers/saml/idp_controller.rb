@@ -345,9 +345,9 @@ PRIVATE_KEY
         signed_xml = if true # sign_response?
                        sd = Xmldsig::SignedDocument.new(unsigned_xml)
                        sd.sign(OpenSSL::PKey.read secret_key, "curse you perry the platypus")
-                     else
+        else
                        unsigned_xml
-                     end
+        end
 
         Base64.strict_encode64(signed_xml)
       end

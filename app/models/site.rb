@@ -1,5 +1,4 @@
 class Site < ApplicationRecord
-
   store_accessor(:extra_settings, :organization_name, :organization_display_name, :organization_url)
 
   normalizes :signing_certificates, :encryption_certificates, with: proc { |certs|
@@ -100,7 +99,7 @@ class Site < ApplicationRecord
                   ]
                 )
               )
-            end,
+            end
           ]
           idp.want_authn_requests_signed = true
           idp.single_logout_services = [

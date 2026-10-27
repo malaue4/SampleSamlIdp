@@ -82,7 +82,7 @@ module Saml
                     ]
                   )
                 )
-              end,
+              end
             ]
             idp.want_authn_requests_signed = true
             idp.single_logout_services = [

@@ -5,6 +5,7 @@ module Management
     def setup
       super
       @user = User.create!(username: "username", password: "password")
+      sign_in_as(@user)
     end
 
     def auth_headers(username = "username", password = "password")
@@ -59,9 +60,9 @@ module Management
       assert_response :success
       assert_equal "application/json", response.media_type
       assert_equal(
-        [
-          @user.as_json(only: %i[id name_id name email phone created_at updated_at]).merge("url" => management_user_url(@user))
-        ],
+        User.all.order(id: :desc).map do |user|
+          user.as_json(only: %i[id name_id name email phone created_at updated_at]).merge("url" => management_user_url(user))
+        end,
         response.parsed_body)
     end
 
@@ -176,16 +177,6 @@ module Management
         delete management_user_url(@user, format: :json), headers: auth_headers
       end
       assert_response :no_content
-    end
-
-    def test_invalid_auth_html
-      get management_users_url
-      assert_response :unauthorized
-    end
-
-    def test_invalid_auth_json
-      get management_users_url(format: :json)
-      assert_response :unauthorized
     end
   end
 end

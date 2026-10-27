@@ -21,7 +21,7 @@ module Saml
 
       assert_kind_of NameId, subject.user_id
       assert_equal "user@example.com", subject.user_id.value
-      assert_equal "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", subject.user_id.format
+      assert_equal "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", subject.user_id.name_id_format
 
       assert_equal 1, subject.subject_confirmations.size
       confirmation = subject.subject_confirmations.first
@@ -31,7 +31,7 @@ module Saml
     end
 
     test "build_xml" do
-      name_id = NameId.new(value: "user@example.com", format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
+      name_id = NameId.new(value: "user@example.com", name_id_format: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
       data = SubjectConfirmation::Data.new(recipient: "https://sp.example.com/acs", not_on_or_after: "2025-01-01T13:00:00Z".to_time)
       confirmation = SubjectConfirmation.new(method: "urn:oasis:names:tc:SAML:2.0:cm:bearer", subject_confirmation_data: data)
       subject = Subject.new(user_id: name_id, subject_confirmations: [ confirmation ])

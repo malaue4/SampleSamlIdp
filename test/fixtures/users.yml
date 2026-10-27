@@ -1,6 +1,7 @@
 <% password_digest = BCrypt::Password.create("password") %>
 
 one:
+  name_id: one
   username: one
   password_digest: <%= password_digest %>
   name: <%= Faker::FunnyName.name %>
@@ -9,6 +10,7 @@ one:
   notes: {}
 
 two:
+  name_id: two
   username: two
   password_digest: <%= password_digest %>
   name: <%= Faker::FunnyName.name %>

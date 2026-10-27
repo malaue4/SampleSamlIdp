@@ -4,7 +4,7 @@ This is a Ruby on Rails application that serves as a SAML 2.0 Identity Provider 
 
 ## Stack
 
-*   **Language:** Ruby 4.0.1
+*   **Language:** Ruby 4.0
 *   **Framework:** Rails 7.2.x
 *   **Database:** PostgreSQL
 *   **Frontend:** Bootstrap 5, Sass, Yarn for CSS bundling
@@ -94,7 +94,7 @@ bin/rails test
 ## TODOs
 
 *   [ ] Complete implementation of `AttributeAuthorityService` in `IdpController#attributes`.
-*   [ ] Verify and update the `ruby` version in `.tool-versions` (currently shows 4.0.1 which might be future-dated or a typo).
+*   [ ] Verify and update the `ruby` version in `.tool-versions` (currently shows 4.0.9 which might be future-dated or a typo).
 *   [ ] Add more comprehensive system tests for SAML flows.
 
 ## License

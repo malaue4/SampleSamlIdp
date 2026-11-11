@@ -203,7 +203,7 @@ GEM
     nokogiri (1.19.4-x86_64-linux-musl)
       racc (~> 1.4)
     ostruct (0.6.3)
-    pagy (43.8.1)
+    pagy (43.8.2)
       json
       uri
       yaml
@@ -404,7 +404,7 @@ DEPENDENCIES
   jbuilder
   minitest-rails
   ostruct (~> 0.6.3)
-  pagy (~> 43.0)
+  pagy (~> 43.8)
   pg (~> 1.1)
   puma (>= 5.0)
   rails (~> 8.1.0)

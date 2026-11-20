@@ -28,7 +28,7 @@ gem "jbuilder"
 gem "bcrypt", "~> 3.1.7"
 
 gem "bootstrap_form", "~> 5"
-gem "cancancan", "~> 3.6"
+gem "cancancan", "~> 3.7"
 gem "chartkick", "~> 5.0"
 gem "faker", "~> 3.4"
 gem "groupdate", "~> 6.4"
